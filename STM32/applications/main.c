@@ -6,6 +6,8 @@
  * Change Logs:
  * Date           Author       Notes
  * 2022-01-08     RT-Thread    first version
+ *
+ * Test git update
  */
 
 #include <rtthread.h>
