@@ -8,14 +8,14 @@
 <booleanAttribute key="ilg.gnumcueclipse.debug.gdbjtag.qemu.enableSemihosting" value="true"/>
 <stringAttribute key="ilg.gnumcueclipse.debug.gdbjtag.qemu.gdbClientOtherCommands" value="set mem inaccessible-by-default off&#10;"/>
 <stringAttribute key="ilg.gnumcueclipse.debug.gdbjtag.qemu.gdbClientOtherOptions" value=""/>
-<stringAttribute key="ilg.gnumcueclipse.debug.gdbjtag.qemu.gdbServerBoardModel" value="?"/>
+<stringAttribute key="ilg.gnumcueclipse.debug.gdbjtag.qemu.gdbServerBoardModel" value="virt"/>
 <intAttribute key="ilg.gnumcueclipse.debug.gdbjtag.qemu.gdbServerCpuQuantity" value="1"/>
 <booleanAttribute key="ilg.gnumcueclipse.debug.gdbjtag.qemu.gdbServerEnableNetwork" value="false"/>
 <stringAttribute key="ilg.gnumcueclipse.debug.gdbjtag.qemu.gdbServerExecutable" value="${debugger_install_path}/${qemu_debugger_relative_path}\qemu-system-arm.exe"/>
-<stringAttribute key="ilg.gnumcueclipse.debug.gdbjtag.qemu.gdbServerExtraQemuCmd" value=""/>
+<stringAttribute key="ilg.gnumcueclipse.debug.gdbjtag.qemu.gdbServerExtraQemuCmd" value="--kernel Debug/rtthread.elf -serial stdio -monitor null -show-cursor"/>
 <stringAttribute key="ilg.gnumcueclipse.debug.gdbjtag.qemu.gdbServerSdcardMemory" value="64.0"/>
 <stringAttribute key="ilg.gnumcueclipse.debug.gdbjtag.qemu.gdbServerSerialPort" value="COM1"/>
-<stringAttribute key="ilg.gnumcueclipse.debug.gdbjtag.qemu.gdbServerStartup" value="${studio_install_path}/repo/Extract/Debugger_Support_Packages/RealThread/QEMU/4.2.0.4/qemu-system-arm.exe -M ? -sd sd.bin -nographic -S -s"/>
+<stringAttribute key="ilg.gnumcueclipse.debug.gdbjtag.qemu.gdbServerStartup" value="${debugger_install_path}/${qemu_debugger_relative_path}\qemu-system-arm.exe -M virt -sd sd.bin -nographic -S -s"/>
 <stringAttribute key="ilg.gnumcueclipse.debug.gdbjtag.qemu.gdbServerTapName" value=""/>
 <stringAttribute key="ilg.gnumcueclipse.debug.gdbjtag.qemu.otherInitCommands" value=""/>
 <stringAttribute key="ilg.gnumcueclipse.debug.gdbjtag.qemu.otherRunCommands" value=""/>
