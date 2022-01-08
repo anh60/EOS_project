@@ -8,6 +8,7 @@
  * 2022-01-08     RT-Thread    first version
  *
  * Test git update
+ * ny endring
  */
 
 #include <rtthread.h>
