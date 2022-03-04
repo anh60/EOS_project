@@ -6,6 +6,8 @@
  * Change Logs:
  * Date           Author       Notes
  * 2018-11-06     SummerGift   first version
+ *
+ * Test changes in rt thread
  */
 
 #include <rtthread.h>
