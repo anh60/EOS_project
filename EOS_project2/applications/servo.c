@@ -7,3 +7,8 @@
  * Date           Author       Notes
  * 2022-03-04     Maja Markusson       the first version
  */
+#include "servo.h"
+
+void init (void) {
+
+}

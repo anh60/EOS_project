@@ -10,6 +10,6 @@
 #ifndef APPLICATIONS_SERVO_H_
 #define APPLICATIONS_SERVO_H_
 
-
+void init (void);
 
 #endif /* APPLICATIONS_SERVO_H_ */
