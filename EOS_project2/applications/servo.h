@@ -11,5 +11,6 @@
 #define APPLICATIONS_SERVO_H_
 
 void init (void);
+void servo_send();
 
 #endif /* APPLICATIONS_SERVO_H_ */

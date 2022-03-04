@@ -8,6 +8,7 @@
  * 2022-03-04     Maja Markusson       the first version
  */
 #include "servo.h"
+#include "rtthread.h"
 
 void init (void) {
     /*INIT TIMER
@@ -29,4 +30,18 @@ void init (void) {
      *
      *START TIMER
     */
+
+    char thread_name = "servo_thread";
+    rt_uint32_t thread_stackSize = 32;
+    rt_uint8_t thread_priority = 1;
+    rt_uint32_t thread_tick = RT_NULL;
+
+    rt_thread_t servo_thread = rt_thread_create(thread_name, servo_send, RT_NULL, thread_stackSize, thread_priority, thread_tick);
+
+    return;
+
+}
+
+void servo_send() {
+    return;
 }
