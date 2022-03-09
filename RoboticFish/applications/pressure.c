@@ -9,7 +9,7 @@
  */
 
 #include <rtthread.h>
-#include <rttime.h>
+//#include <rttime.h>
 #include "pressure.h"
 
 #define THREAD_PRIORITY         50
@@ -39,9 +39,9 @@ int pressure_init(void){
     //TODO convert into ms
     int timeout_clockticks = 10;
 
-    pressure_timer = rt_timer_create("pressure_timer", servo_calculate_positions,
-                                 RT_NULL, timeout_clockticks,
-                                 RT_TIMER_FLAG_PERIODIC);
+//    pressure_timer = rt_timer_create("pressure_timer", servo_calculate_positions,
+//                                 RT_NULL, timeout_clockticks,
+//                                 RT_TIMER_FLAG_PERIODIC);
 
     return 0;
 }
@@ -74,4 +74,4 @@ static void pressure_handler(void) {
 
 //TODO what this function do?:))
 /* Export to msh command list */
-MSH_CMD_EXPORT(thread_sample, thread sample);
+//MSH_CMD_EXPORT(thread_sample, thread sample);

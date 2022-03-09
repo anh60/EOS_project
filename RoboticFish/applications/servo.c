@@ -16,7 +16,7 @@
  */
 #include "servo.h"
 #include "rtthread.h"
-#include <rttime.h>
+//#include <rttime.h>
 
 //three servomotors could either correspond to a
 //array or they could have a dedicated id
@@ -63,31 +63,31 @@ void servo_init (void) {
                                  RT_TIMER_FLAG_PERIODIC);
 
     //init threads
-    rt_thread servo_thread_set = RT_NULL;
-    rt_thread servo_thread_calculate = RT_NULL;
+//    rt_thread servo_thread_set = RT_NULL;
+//    rt_thread servo_thread_calculate = RT_NULL;
 
     rt_uint32_t thread_stackSize = 32;
     rt_uint8_t thread_priority = 1;
     rt_uint32_t thread_tick = RT_NULL;
 
-    servo_thread_set = rt_thread_create("servo_thread_set", servo_set_positions,
-                                    RT_NULL, thread_stackSize,
-                                    thread_priority, thread_tick);
+//    servo_thread_set = rt_thread_create("servo_thread_set", servo_set_positions,
+//                                    RT_NULL, thread_stackSize,
+//                                    thread_priority, thread_tick);
 
-    servo_thread_calculate = rt_thread_create("servo_thread_calculate", servo_set_positions,
-                                    RT_NULL, thread_stackSize,
-                                    thread_priority, thread_tick);
+//    servo_thread_calculate = rt_thread_create("servo_thread_calculate", servo_set_positions,
+//                                    RT_NULL, thread_stackSize,
+//                                    thread_priority, thread_tick);
 
-    if (servo_thread_set == RT_NULL) { return; }
+//    if (servo_thread_set == RT_NULL) { return; }
 
-    if (servo_thread_calculate == RT_NULL) { return; }
+//    if (servo_thread_calculate == RT_NULL) { return; }
 
     //TODO here we need a way to coordinate the first timers so they dont "collide"
     //start the calculation thread
-    rt_thread_start(servo_thread_calculate);
+//    rt_thread_start(servo_thread_calculate);
 
     //start the timer
-    if (servo_timer != RT_NULL) rt_timer_start(servo_timer_set);
+//    if (servo_timer != RT_NULL) rt_timer_start(servo_timer_set);
 
     return;
 
@@ -99,11 +99,11 @@ void servo_init (void) {
 static void servo_set_positions(int id, int servo_value) {
     //send to device x,y or z
 
-    rt_err_t err = rt_thread_suspend(servo_thread);
+//    rt_err_t err = rt_thread_suspend(servo_thread);
 
-    if (err != RT_EOK) {
+//    if (err != RT_EOK) {
         //some error has occurred, fix
-    }
+//    }
 
     rt_schedule();
 
@@ -118,5 +118,5 @@ static int servo_calculate_positions(int servo_value) {
 }
 
 /* Export to msh command list */
-MSH_CMD_EXPORT(thread_sample, thread sample);
+//MSH_CMD_EXPORT(thread_sample, thread sample);
 

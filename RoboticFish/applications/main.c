@@ -6,6 +6,8 @@
  * Change Logs:
  * Date           Author       Notes
  * 2022-03-09     RT-Thread    first version
+ *
+ * PRINT WORKS WITH DEBUG LAUNCH (ctrl + f5)
  */
 
 #include <rtthread.h>
