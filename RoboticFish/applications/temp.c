@@ -5,27 +5,31 @@
 struct sensor_temp sensor_temp;
 
 /* Thread 1 */
-int read_temp(void *param)
+static void read_temp(void *param)
 {
-     /*Read and return temperature*/
-    return 0;
+    /*Read and return temperature*/
+    struct sensor_temp *sensor_temp = param;
+    //Generate random ADC value from 0 to 2^NBIT
+    int range = 1 << ADC_NBITS;
+    int temp = srand(time(0)) % range;
+
+    sensor_temp->temperature = temp;
 }
 
 /* Thread 2 */
-void store_temp(void *param)
+static void store_temp(void *param)
 {
     /*Store temperature using store_temp*/
 }
 
-/* Thread Sample */
-sensor_temp_t sensor_temp_init(void *param)
+/* Initialize temperature sensor */
+sensor_temp_t sensor_temp_init(void)
 {
-
    /* Initialize variables */
     sensor_temp.temperature = 0;
 
    /* Initialize thread 1 */
-    sensor_temp.read_temp = rt_thread_create_periodic("read_temp",              //Name
+  /*  sensor_temp.read_temp = rt_thread_create_periodic("read_temp",              //Name
                                                        read_temp,               //Function
                                                        &sensor_temp,            //Object
                                                        READ_TEMP_STACK_SIZE,    //Stack size

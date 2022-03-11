@@ -13,13 +13,15 @@
 #include <rtdef.h>
 
 
+#define ADC_NBITS 8;
 //READ_TEMP
 #define READ_TEMP_STACK_SIZE  1024
 #define READ_TEMP_PRIORITY 1
-#define READ_TEMP_ACTION_PERIOD 500 /* 5 seconds */
+#define READ_TEMP_ACTION_PERIOD 100 /* 1 seconds */
 //STORE_TEMP
 #define STORE_TEMP_STACK_SIZE 1024
 #define STORE_TEMP_PRIORITY 1
+
 
 struct sensor_temp {
     rt_thread_t read_temp;
@@ -29,10 +31,11 @@ struct sensor_temp {
 };
 typedef struct sensor_temp *sensor_temp_t;
 
+
 //Threads
-int read_temp(void *param);
-void store_temp(void *param);
+static void read_temp(void *param);
+static void store_temp(void *param);
 //Functions
-sensor_temp_t sesnor_temp_init(void *param);
+sensor_temp_t sensor_temp_init(void);
 
 #endif /* __TEMP_H__ */

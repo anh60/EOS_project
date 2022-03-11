@@ -10,19 +10,24 @@
  * PRINT WORKS WITH DEBUG LAUNCH (ctrl + f5)
  */
 
-#include <rtthread.h>
-
-#define DBG_TAG "main"
-#define DBG_LVL DBG_LOG
-#include <rtdbg.h>
+#include "temp.h"
 
 int main(void)
 {
-    int count = 1;
+    //Objects
+    sensor_temp_t sensor_temp_1;
 
+    //Initialize temperature sensor
+    sensor_temp_1 = sensor_temp_init();
+
+    if(!sensor_temp_1) {
+        rt_kprintf("Failed to initialize temperature sensor");
+        return RT_ERROR;
+    }
+    int count = 1;
     while (count++)
     {
-        LOG_D("Hello RT-Thread!");
+        rt_kprintf("ADC TEMP: %d \n", sensor_temp_1->temperature);
         rt_thread_mdelay(1000);
     }
 
