@@ -2,40 +2,52 @@
 
 #include "temp.h"
 
-struct sensor_temp sensor_temp = { };
+struct sensor_temp sensor_temp;
 
-/* Entry Function for Thread 1 */
-static int read_temp(void *parameter)
+/* Thread 1 */
+int read_temp(void *param)
 {
      /*Read and return temperature*/
     return 0;
 }
 
-/* Entry for Thread 2 */
-//static void store_temp(void *param)
-//{
-    /*Store temperature using store_temp*/
-
-//}
-
-/* Thread Sample */
-int thread_sample(void)
+/* Thread 2 */
+void store_temp(void *param)
 {
-   /* Create thread 1, Name is thread1,Entry is thread1_entry */
-    sensor_temp.read_temp = rt_thread_create_periodic("read_temp",              //Name
-                                                       read_temp,               //Function
-                                                       &sensor_temp,            //Stack size; MIGHT NEED TEMP_THREAD_STACH_SIZE INSTEAD
-                                                       READ_TEMP_PRIORITY,      //Priority
-                                                       1,                       //Ticks
-                                                       TEMP_HOST_ACTION_PERIOD  //Period
-                                                       );
-
-    /* Start this thread if you get the thread control block */
-//    if (tid1 != RT_NULL)
-//        rt_thread_startup(tid1);
-    return 0;
+    /*Store temperature using store_temp*/
 }
 
-/* Export to msh command list */
-//MSH_CMD_EXPORT(thread_sample, thread sample);
+/* Thread Sample */
+sensor_temp_t sensor_temp_init(void *param)
+{
+
+   /* Initialize variables */
+    sensor_temp.temperature = 0;
+
+   /* Initialize thread 1 */
+    sensor_temp.read_temp = rt_thread_create_periodic("read_temp",              //Name
+                                                       read_temp,               //Function
+                                                       &sensor_temp,            //Object
+                                                       READ_TEMP_STACK_SIZE,    //Stack size
+                                                       READ_TEMP_PRIORITY,      //Priority
+                                                       1,                       //Ticks
+                                                       READ_TEMP_ACTION_PERIOD  //Period
+                                                       );
+
+    if(!sensor_temp.read_temp)
+        return RT_NULL;
+
+    /* Initialize thread 2 */
+     sensor_temp.store_temp = rt_thread_create("store_temp",           //Name
+                                                store_temp,            //Function
+                                                &sensor_temp,          //Object
+                                                STORE_TEMP_STACK_SIZE, //Stack size
+                                                STORE_TEMP_PRIORITY,   //Priority
+                                                1                      //Ticks
+                                                );
+     if(!sensor_temp.store_temp)
+         return RT_NULL;
+
+    return &sensor_temp;
+}
 

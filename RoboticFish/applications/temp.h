@@ -7,18 +7,32 @@
  * Date           Author       Notes
  * 2022-03-04     Maja Markusson       the first version
  */
-#ifndef __APPLICATIONS_TEMP_H__
-#define __APPLICATIONS_TEMP_H__
+#ifndef __TEMP_H__
+#define __TEMP_H__
 
-#define TEMP_THREAD_STACH_SIZE  1024
-#define TEMP_HOST_ACTION_PERIOD 500 /* 5 seconds */
+#include <rtdef.h>
+
+
+//READ_TEMP
+#define READ_TEMP_STACK_SIZE  1024
 #define READ_TEMP_PRIORITY 1
+#define READ_TEMP_ACTION_PERIOD 500 /* 5 seconds */
+//STORE_TEMP
+#define STORE_TEMP_STACK_SIZE 1024
 #define STORE_TEMP_PRIORITY 1
 
 struct sensor_temp {
     rt_thread_t read_temp;
     rt_thread_t store_temp;
+
+    int temperature;
 };
 typedef struct sensor_temp *sensor_temp_t;
 
-#endif /* APPLICATIONS_TEMP_H_ */
+//Threads
+int read_temp(void *param);
+void store_temp(void *param);
+//Functions
+sensor_temp_t sesnor_temp_init(void *param);
+
+#endif /* __TEMP_H__ */
