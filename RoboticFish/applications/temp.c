@@ -2,10 +2,6 @@
 
 #include "temp.h"
 
-#define THREAD_PRIORITY         25
-#define THREAD_STACK_SIZE       512
-#define THREAD_TIMESLICE        5
-
 struct sensor_temp sensor_temp = { };
 
 /* Entry Function for Thread 1 */
@@ -16,9 +12,9 @@ static int read_temp(void *parameter)
 }
 
 /* Entry for Thread 2 */
-//static void storeTemp(void *param)
+//static void store_temp(void *param)
 //{
-    /*Store temperature using getTemp*/
+    /*Store temperature using store_temp*/
 
 //}
 
