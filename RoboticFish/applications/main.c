@@ -24,6 +24,7 @@ int main(void)
         rt_kprintf("Failed to initialize temperature sensor");
         return RT_ERROR;
     }
+
     int count = 1;
     while (count++)
     {
