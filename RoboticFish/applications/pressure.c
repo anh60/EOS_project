@@ -23,19 +23,34 @@ static char storePressure_stack[1024];
 /* Thread Sample */
 int pressure_init(void){
 
+    //init timers
+    static rt_timer_t pressure_timer;
+
+    //this is in clockticks
+    //TODO convert into ms
+    int timeout_clockticks = 10;
+
+    pressure_timer = rt_timer_create("pressure_timer",
+                                     pressure_handler,
+                                     RT_NULL,
+                                     timeout_clockticks,
+                                     RT_TIMER_FLAG_PERIODIC);
+
     // Create thread
-    pressure_thread = rt_thread_create_periodic("pressure_thread",
-                                                pressure_handler,
-                                                RT_NULL,
-                                                THREAD_STACK_SIZE,
-                                                THREAD_PRIORITY,
-                                                THREAD_TIMESLICE,
-                                                HOST_ACTION_PERIOD
-                                                );
+    pressure_thread = rt_thread_create("pressure_thread",
+                                        pressure_handler,
+                                        RT_NULL,
+                                        THREAD_STACK_SIZE,
+                                        THREAD_PRIORITY,
+                                        THREAD_TIMESLICE
+                                        );
 
 
     // Check that creation of thread was successful
     if ( pressure_thread == RT_NULL) { return -1; }
+
+    rt_err_t err = rt_timer_start(pressure_timer);
+    if (err != RT_NULL) {return -1;}
 
     return 0;
 }
@@ -54,7 +69,7 @@ static void pressure_store(int pressure) {
 }
 
 //TODO check that it is no problem suspending oneself
-static void pressure_handler(void) {
+static void pressure_handler(void *param) {
     int pressure = pressure_get();
     pressure_store(pressure);
 

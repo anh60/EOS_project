@@ -15,7 +15,7 @@
 int pressure_init(void);
 static int pressure_get(void);
 static void pressure_store(int pressure);
-static void pressure_handler(void);
+static void pressure_handler(void *param);
 
 
 #endif /* APPLICATIONS_PRESSURE_H_ */
