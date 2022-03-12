@@ -12,28 +12,22 @@
 #include "pressure.h"
 #include <stdlib.h>
 
-#define THREAD_PRIORITY         50
+#define THREAD_PRIORITY         2
 #define THREAD_STACK_SIZE       512
 #define THREAD_TIMESLICE        1
-#define HOST_ACTION_PERIOD      40
+#define TIMEOUT                 10
 
 static rt_thread_t pressure_thread = RT_NULL;
-static char storePressure_stack[1024];
 
 /* Thread Sample */
 int pressure_init(void){
 
-    //init timers
     static rt_timer_t pressure_timer;
 
-    //this is in clockticks
-    //TODO convert into ms
-    int timeout_clockticks = 10;
-
     pressure_timer = rt_timer_create("pressure_timer",
-                                     pressure_handler,
+                                     start_thread,
                                      RT_NULL,
-                                     timeout_clockticks,
+                                     TIMEOUT,
                                      RT_TIMER_FLAG_PERIODIC);
 
     // Create thread
@@ -84,5 +78,9 @@ static void pressure_handler(void *param) {
     return;
 }
 
+static void start_thread(void *param){
+    rt_thread_startup(pressure_thread);
+    return;
+}
 
 //map timer til event

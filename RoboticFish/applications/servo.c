@@ -17,7 +17,12 @@
 #include "servo.h"
 #include <rtthread.h>
 
-#define HOST_ACTION_PERIOD      40
+#define THREAD_PRIORITY         3
+#define THREAD_STACK_SIZE       512
+#define THREAD_TIMESLICE        1
+
+#define TIMEOUT_SET             10
+#define TIMEOUT_CALCULATE       45
 
 //init threads
 rt_thread_t servo_thread_set = RT_NULL;
@@ -30,9 +35,6 @@ void servo_init (void) {
 
     //TIMER HANDLING
     //static rt_timer_t servo_timer_init;
-
-    int timeout_clockticks = 10;
-
     /*servo_timer_init = rt_timer_create("servo_timer_init",
                                      servo_timer_set,
                                      RT_NULL,
@@ -43,7 +45,7 @@ void servo_init (void) {
     rt_timer_t servo_timer_set = rt_timer_create("servo_timer_set",
                                       start_thread_1,
                                       RT_NULL,
-                                      timeout_clockticks,
+                                      TIMEOUT_SET,
                                       (/*RT_TIMER_FLAG_SOFT_TIMER ||*/ RT_TIMER_FLAG_PERIODIC));
 
 
@@ -51,27 +53,23 @@ void servo_init (void) {
     rt_timer_t servo_timer_calculate = rt_timer_create("servo_timer_calculate",
                                             start_thread_2,
                                             RT_NULL,
-                                            timeout_clockticks,
+                                            TIMEOUT_CALCULATE,
                                             (/*RT_TIMER_FLAG_SOFT_TIMER ||*/ RT_TIMER_FLAG_PERIODIC));
 
     //THREAD HANDLING
-    rt_uint32_t thread_stackSize = 32;
-    rt_uint8_t thread_priority = 1;
-    rt_uint32_t thread_tick = RT_NULL;
-
     servo.servo_thread_set = rt_thread_create("servo_thread_set",
                                         servo_set_positions,
                                         &servo,
-                                        thread_stackSize,
-                                        thread_priority,
-                                        thread_tick);
+                                        THREAD_STACK_SIZE,
+                                        THREAD_PRIORITY,
+                                        THREAD_TIMESLICE);
 
     servo.servo_thread_calculate = rt_thread_create("servo_thread_calculate",
                                                servo_calculate_positions,
                                                &servo,
-                                               thread_stackSize,
-                                               thread_priority,
-                                               thread_tick);
+                                               THREAD_STACK_SIZE,
+                                               THREAD_PRIORITY,
+                                               THREAD_TIMESLICE);
 
 
     if (servo.servo_thread_set == RT_NULL) { return; }
