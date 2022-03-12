@@ -25,7 +25,7 @@ struct servo_motor {
 
 typedef struct servo_motor *servo_motor_p;
 
-void servo_init(void);
+int servo_init(void);
 static void servo_set_positions(void *param);
 static void servo_calculate_positions(void *param);
 static void start_thread_1(void *param);

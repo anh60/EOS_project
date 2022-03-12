@@ -31,7 +31,7 @@ rt_thread_t servo_thread_calculate = RT_NULL;
 
 struct servo_motor servo;
 
-void servo_init (void) {
+int servo_init (void) {
 
     //TIMER HANDLING
     //static rt_timer_t servo_timer_init;
@@ -72,16 +72,16 @@ void servo_init (void) {
                                                THREAD_TIMESLICE);
 
 
-    if (servo.servo_thread_set == RT_NULL) { return; }
-    if (servo.servo_thread_calculate == RT_NULL) { return; }
+    if (servo.servo_thread_set == RT_NULL) { return -2; }
+    if (servo.servo_thread_calculate == RT_NULL) { return -2; }
 
     rt_err_t err = rt_timer_start(servo_timer_set);
-    if (err != 0){ return;}
+    if (err != 0){ return -1;}
 
     err = rt_timer_start(servo_timer_calculate);
-    if (err != 0){ return;}
+    if (err != 0){ return -1;}
 
-    return;
+    return 0;
 
 }
 
