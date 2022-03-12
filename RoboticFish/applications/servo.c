@@ -19,7 +19,6 @@
 
 #define HOST_ACTION_PERIOD      40
 
-
 //init threads
 rt_thread_t servo_thread_set = RT_NULL;
 rt_thread_t servo_thread_calculate = RT_NULL;
@@ -31,26 +30,43 @@ rt_thread_t servo_thread_calculate = RT_NULL;
 
 void servo_init (void) {
 
+    //TIMER HANDLING
+    static rt_timer_t servo_timer_set;
+    static rt_timer_t servo_timer_calculate;
+
+    //this is in clockticks
+    //TODO convert into ms
+    int timeout_clockticks = 10;
+
+    servo_timer_set = rt_timer_create("servo_timer_set", servo_calculate_positions,
+                                 RT_NULL, timeout_clockticks,
+                                 RT_TIMER_FLAG_PERIODIC);
+
+
+    //TODO the function evoked should be the thread handling the servo
+    servo_timer_calculate = rt_timer_create("servo_timer_calculate", servo_set_positions,
+                                 RT_NULL, timeout_clockticks,
+                                 RT_TIMER_FLAG_PERIODIC);
+
+
     //THREAD HANDLING
     rt_uint32_t thread_stackSize = 32;
     rt_uint8_t thread_priority = 1;
     rt_uint32_t thread_tick = RT_NULL;
 
-    servo_thread_set = rt_thread_create_periodic("servo_thread_set",
-                                                 servo_set_positions,
-                                                 RT_NULL,
-                                                 thread_stackSize,
-                                                 thread_priority,
-                                                 thread_tick,
-                                                 HOST_ACTION_PERIOD);
+    servo_thread_set = rt_thread_create("servo_thread_set",
+                                        servo_set_positions,
+                                        RT_NULL,
+                                        thread_stackSize,
+                                        thread_priority,
+                                        thread_tick);
 
-    servo_thread_calculate = rt_thread_create_periodic("servo_thread_calculate",
-                                                        servo_set_positions,
-                                                        RT_NULL,
-                                                        thread_stackSize,
-                                                        thread_priority,
-                                                        thread_tick,
-                                                        HOST_ACTION_PERIOD);
+    servo_thread_calculate = rt_thread_create("servo_thread_calculate",
+                                               servo_set_positions,
+                                               RT_NULL,
+                                               thread_stackSize,
+                                               thread_priority,
+                                               thread_tick);
 
     if (servo_thread_set == RT_NULL) { return; }
     if (servo_thread_calculate == RT_NULL) { return; }
