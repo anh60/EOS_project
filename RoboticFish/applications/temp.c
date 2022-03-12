@@ -19,7 +19,7 @@ static void read_temp(void *param)
     int temp = rand() % range;
 
     sensor_temp->temperature = temp;
-    rt_kprintf("Running read_temp at %d and storing variable %d \n", rt_tick_get(), sensor_temp->temperature);
+    rt_kprintf("Running read_temp at %d and reading variable %d \n", rt_tick_get(), sensor_temp->temperature);
 
 
 }
@@ -28,7 +28,8 @@ static void read_temp(void *param)
 static void store_temp(void *param)
 {
     /*Store temperature using store_temp*/
-    rt_kprintf("Running store_temp at %d \n", rt_tick_get());
+    struct sensor_temp *sensor_temp = param;
+    rt_kprintf("Running store_temp at %d and storing variable %d \n", rt_tick_get(), sensor_temp->temperature);
 }
 
 /* Initialize temperature sensor */
@@ -40,7 +41,7 @@ sensor_temp_t sensor_temp_init(void)
    /* Initialize timer */
     timer_read_temp = rt_timer_create("timer_read_temp",
                                read_temp,
-                               &timer_read_temp,
+                               &sensor_temp,
                                READ_TEMP_ACTION_PERIOD,
                                (RT_TIMER_FLAG_PERIODIC)
                                );
@@ -52,7 +53,7 @@ sensor_temp_t sensor_temp_init(void)
 
     timer_store_temp = rt_timer_create("timer_read_temp",
                                store_temp,
-                               &timer_store_temp,
+                               &sensor_temp,
                                READ_TEMP_ACTION_PERIOD,
                                (RT_TIMER_FLAG_PERIODIC)
                                );
@@ -68,7 +69,7 @@ sensor_temp_t sensor_temp_init(void)
                                               &sensor_temp,            //Object
                                               READ_TEMP_STACK_SIZE,    //Stack size
                                               READ_TEMP_PRIORITY,      //Priority
-                                              1                       //Ticks
+                                              1                        //Ticks
                                               );
 
     if(!sensor_temp.read_temp)
