@@ -32,6 +32,10 @@ struct sensor_temp {
 typedef struct sensor_temp *sensor_temp_t;
 
 
+//Timer triggers
+static void timer_trigger_read_temp(void *param);
+static void timer_trigger_store_temp(void *param);
+
 //Threads
 static void read_temp(void *param);
 static void store_temp(void *param);
