@@ -18,7 +18,7 @@
 #include <rtthread.h>
 
 #define THREAD_PRIORITY         3
-#define THREAD_STACK_SIZE       512
+#define THREAD_STACK_SIZE       256
 #define THREAD_TIMESLICE        1
 
 #define TIMEOUT_SET             10
