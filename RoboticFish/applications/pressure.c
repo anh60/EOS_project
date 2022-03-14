@@ -13,7 +13,7 @@
 #include <stdlib.h>
 
 #define THREAD_PRIORITY         2
-#define THREAD_STACK_SIZE       512
+#define THREAD_STACK_SIZE       256
 #define THREAD_TIMESLICE        1
 #define TIMEOUT                 10
 
@@ -79,8 +79,9 @@ static void pressure_handler(void *param) {
 }
 
 static void start_thread(void *param){
-    rt_thread_startup(pressure_thread);
+    rt_kprintf("start_thread");
+    rt_err_t err = rt_thread_startup(pressure_thread);
+    if (err != 0){rt_kprintf("mistake");}
     return;
 }
 
-//map timer til event
