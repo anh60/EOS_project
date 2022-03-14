@@ -4,7 +4,11 @@
 
 #include "temp.h"
 
+#define EVENT_FLAG1 (1 << 1)
+#define EVENT_FLAG2 (1 << 2)
+
 struct sensor_temp sensor_temp;
+rt_event_t event;
 rt_timer_t timer_read_temp;
 rt_timer_t timer_store_temp;
 
@@ -13,30 +17,37 @@ static void timer_trigger_read_temp(void *param){
     /*Trigger thread 1*/
     struct sensor_temp *sensor_temp = param;
     rt_thread_resume(sensor_temp->read_temp);
-
+    rt_schedule();
 }
 
 static void timer_trigger_store_temp(void *param){
     /*Trigger thread 2*/
     struct sensor_temp *sensor_temp = param;
     rt_thread_resume(sensor_temp->store_temp);
+    rt_schedule();
 }
 
 /* Thread 1 */
 static void read_temp(void *param)
 {
-    /*Read and return temperature*/
+    /*Read temperature*/
     struct sensor_temp *sensor_temp = param;
 
-    //Generate random ADC value from 0 to 2^NBIT
-    int range = 1 << ADC_NBITS;
-    int temp = rand() % range;
+    while(1)
+    {
+        rt_enter_critical();
+       //Generate random ADC value from 0 to 2^NBIT
+        int range = 1 << ADC_NBITS;
+        int temp = rand() % range;
+        sensor_temp->temperature = temp;
 
-    sensor_temp->temperature = temp;
-    rt_kprintf("Running read_temp at ticks %d and reading variable %d \n", rt_tick_get(), sensor_temp->temperature);
-
-    //rt_thread_yield();
-    //rt_schedule();
+        rt_kprintf("Running read_temp at ticks %d and reading variable %d \n",
+                    rt_tick_get(),
+                    sensor_temp->temperature
+                    );
+        rt_exit_critical();
+        rt_thread_delay(1000);
+    }
 
 }
 
@@ -45,10 +56,19 @@ static void store_temp(void *param)
 {
     /*Store temperature using store_temp*/
     struct sensor_temp *sensor_temp = param;
-    rt_kprintf("Running store_temp at ticks %d and storing variable %d \n", rt_tick_get(), sensor_temp->temperature);
+    rt_uint32_t e;
 
-    //rt_thread_suspend();
-    //rt_schedule();
+    while(1)
+    {
+        rt_enter_critical();
+        rt_kprintf("Running store_temp at ticks %d and storing variable %d \n",
+                    rt_tick_get(),
+                    sensor_temp->temperature);
+
+        rt_exit_critical();
+
+        rt_thread_delay(1000);
+    }
 }
 
 /* Initialize temperature sensor */
@@ -71,6 +91,7 @@ sensor_temp_t sensor_temp_init(void)
         return RT_NULL;
     rt_thread_startup(sensor_temp.read_temp);
 
+
     /* Initialize thread 2 */
      sensor_temp.store_temp = rt_thread_create("store_temp",           //Name
                                                 store_temp,            //Function
@@ -86,7 +107,7 @@ sensor_temp_t sensor_temp_init(void)
 
      /* Initialize timers */
       timer_read_temp = rt_timer_create("timer_read_temp",
-                                         read_temp, //Use maybe timer trigger instead
+                                         timer_trigger_read_temp, //Use maybe timer trigger instead
                                          &sensor_temp,
                                          READ_TEMP_ACTION_PERIOD,
                                          RT_TIMER_FLAG_PERIODIC
@@ -98,15 +119,17 @@ sensor_temp_t sensor_temp_init(void)
 
 
       timer_store_temp = rt_timer_create("timer_store_temp",
-                                          store_temp,  //Use maybe timer trigger instead
+                                          timer_trigger_store_temp,  //Use maybe timer trigger instead
                                           &sensor_temp,
-                                          READ_TEMP_ACTION_PERIOD,
+                                          STORE_TEMP_ACTION_PERIOD,
                                           RT_TIMER_FLAG_PERIODIC
                                           );
 
       if(!timer_store_temp)
           return RT_NULL;
       rt_timer_start(timer_store_temp);
+
+
 
     return &sensor_temp;
 }

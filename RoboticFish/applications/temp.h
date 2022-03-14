@@ -21,6 +21,8 @@
 //STORE_TEMP
 #define STORE_TEMP_STACK_SIZE 1024
 #define STORE_TEMP_PRIORITY 1
+#define STORE_TEMP_ACTION_PERIOD 2000 /* 1 seconds = 1000 ticks */
+
 
 
 struct sensor_temp {
