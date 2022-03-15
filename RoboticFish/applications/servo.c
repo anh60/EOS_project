@@ -8,7 +8,7 @@
  * These servo motors requires reading of current position,
  * calculation of new position and setting of the calculated values.
  *
- * This tasks are done using a thread evoked by a timeout.
+ * This tasks are done using a thread evoked by event sent by a timer.
  *
  * Change Logs:
  * Date           Author       Notes
@@ -16,45 +16,43 @@
  */
 #include "servo.h"
 #include <rtthread.h>
+#include "drv_common.h"
 
 #define THREAD_PRIORITY         3
-#define THREAD_STACK_SIZE       256
+#define THREAD_STACK_SIZE       512
 #define THREAD_TIMESLICE        1
 
-#define TIMEOUT_SET             10
-#define TIMEOUT_CALCULATE       45
+//TODO Define ticks per millisecond
+#define TIMEOUT_SET             2000    // 50
+#define TIMEOUT_CALCULATE       1000    // 50?
 
-//init threads
-rt_thread_t servo_thread_set = RT_NULL;
-rt_thread_t servo_thread_calculate = RT_NULL;
+#define EVENT_FLAG3 (1 << 3)
+#define EVENT_FLAG4 (1 << 4)
 
-
+static struct rt_event event;
 struct servo_motor servo;
 
 int servo_init (void) {
-
-    //TIMER HANDLING
-    //static rt_timer_t servo_timer_init;
-    /*servo_timer_init = rt_timer_create("servo_timer_init",
-                                     servo_timer_set,
-                                     RT_NULL,
-                                     timeout_clockticks,
-                                     RT_TIMER_FLAG_PERIODIC);
-    */
+    //EVENT HANDLING
+    rt_err_t err = rt_event_init(&event, "event", RT_IPC_FLAG_FIFO);
+    if (err != RT_EOK)
+    {
+        rt_kprintf("init event failed.\n");
+        return -1;
+    }
 
     rt_timer_t servo_timer_set = rt_timer_create("servo_timer_set",
-                                      start_thread_1,
+                                      start_thread_set,
                                       RT_NULL,
                                       TIMEOUT_SET,
-                                      (/*RT_TIMER_FLAG_SOFT_TIMER ||*/ RT_TIMER_FLAG_PERIODIC));
+                                      RT_TIMER_FLAG_PERIODIC);
 
 
-    //TODO the function evoked should be the thread handling the servo
     rt_timer_t servo_timer_calculate = rt_timer_create("servo_timer_calculate",
-                                            start_thread_2,
+                                            start_thread_calculate,
                                             RT_NULL,
                                             TIMEOUT_CALCULATE,
-                                            (/*RT_TIMER_FLAG_SOFT_TIMER ||*/ RT_TIMER_FLAG_PERIODIC));
+                                            RT_TIMER_FLAG_PERIODIC);
 
     //THREAD HANDLING
     servo.servo_thread_set = rt_thread_create("servo_thread_set",
@@ -75,11 +73,19 @@ int servo_init (void) {
     if (servo.servo_thread_set == RT_NULL) { return -2; }
     if (servo.servo_thread_calculate == RT_NULL) { return -2; }
 
-    rt_err_t err = rt_timer_start(servo_timer_set);
-    if (err != 0){ return -1;}
+    err = rt_thread_startup(servo.servo_thread_set);
+    if (err != 0){ return -3;}
+
+    err = rt_thread_startup(servo.servo_thread_calculate);
+    if (err != 0){ return -3;}
 
     err = rt_timer_start(servo_timer_calculate);
     if (err != 0){ return -1;}
+
+    rt_hw_us_delay(40000);  //Delayed for 40 ms
+
+    err = rt_timer_start(servo_timer_set);
+    if (err != 0){ return -1; }
 
     return 0;
 
@@ -87,38 +93,50 @@ int servo_init (void) {
 
 static void servo_set_positions(void *param) {
 
-    rt_err_t err = rt_thread_suspend(servo.servo_thread_set);
+    rt_uint32_t e;
 
-    if (err != RT_EOK) { /*some error has occurred, fix*/ }
+    while(1){
 
-    rt_schedule();
+        rt_kprintf("In set position thread \n");
+
+        if (rt_event_recv(&event,
+                          EVENT_FLAG3,
+                          RT_EVENT_FLAG_OR | RT_EVENT_FLAG_CLEAR,
+                          RT_WAITING_FOREVER, &e) == RT_EOK)
+        { rt_kprintf("Event received servo set thread. \n", e); }
+
+    }
 
     return;
 }
 
 static void servo_calculate_positions(void *param) {
     struct servo_motor *servo = param;
+    rt_uint32_t e;
 
-    servo->servo_value[0] = 0;
-    servo->servo_value[1] = 1;
-    servo->servo_value[2] = 2;
+    while(1){
 
+        servo->servo_value[0] = 0;
+        servo->servo_value[1] = 1;
+        servo->servo_value[2] = 2;
 
-    rt_err_t err = rt_thread_suspend(servo->servo_thread_calculate);
+        rt_kprintf("In servo calculation thread \n");
 
-    if (err != RT_EOK) { /*some error has occurred, fix*/ }
-
-    rt_schedule();
-
+        if (rt_event_recv(&event,
+                          EVENT_FLAG4,
+                          RT_EVENT_FLAG_OR | RT_EVENT_FLAG_CLEAR,
+                          RT_WAITING_FOREVER, &e) == RT_EOK)
+        { rt_kprintf("Event received servo calc. thread. \n", e); }
+    }
 }
 
-static void start_thread_1(void *param){
-    rt_thread_startup(servo.servo_thread_set);
+static void start_thread_set(void *param){
+    rt_event_send(&event, EVENT_FLAG3);
     return;
 }
 
-static void start_thread_2(void *param){
-    rt_thread_startup(servo.servo_thread_calculate);
+static void start_thread_calculate(void *param){
+    rt_event_send(&event, EVENT_FLAG4);
     return;
 }
 

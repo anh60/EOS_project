@@ -15,7 +15,7 @@
 #define THREAD_PRIORITY         2
 #define THREAD_STACK_SIZE       512
 #define THREAD_TIMESLICE        1
-#define TIMEOUT                 2000
+#define TIMEOUT                 2000  //75 ms
 #define EVENT_FLAG3 (1 << 3)
 
 static rt_thread_t pressure_thread = RT_NULL;
