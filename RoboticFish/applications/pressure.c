@@ -13,14 +13,23 @@
 #include <stdlib.h>
 
 #define THREAD_PRIORITY         2
-#define THREAD_STACK_SIZE       256
+#define THREAD_STACK_SIZE       512
 #define THREAD_TIMESLICE        1
-#define TIMEOUT                 10
+#define TIMEOUT                 2000
+#define EVENT_FLAG3 (1 << 3)
 
 static rt_thread_t pressure_thread = RT_NULL;
+static struct rt_event event;
 
 /* Thread Sample */
 int pressure_init(void){
+    // EVENT
+    rt_err_t err = rt_event_init(&event, "event", RT_IPC_FLAG_FIFO);
+    if (err != RT_EOK)
+    {
+        rt_kprintf("init event failed.\n");
+        return -1;
+    }
 
     static rt_timer_t pressure_timer;
 
@@ -33,17 +42,17 @@ int pressure_init(void){
     // Create thread
     pressure_thread = rt_thread_create("pressure_thread",
                                         pressure_handler,
-                                        RT_NULL,
+                                        pressure_thread,
                                         THREAD_STACK_SIZE,
                                         THREAD_PRIORITY,
                                         THREAD_TIMESLICE
                                         );
 
-
     // Check that creation of thread was successful
     if ( pressure_thread == RT_NULL) { return -1; }
+    rt_thread_startup(pressure_thread);
 
-    rt_err_t err = rt_timer_start(pressure_timer);
+    err = rt_timer_start(pressure_timer);
     if (err != RT_NULL) {return -1;}
 
     return 0;
@@ -64,24 +73,32 @@ static void pressure_store(int pressure) {
 
 //TODO check that it is no problem suspending oneself
 static void pressure_handler(void *param) {
-    int pressure = pressure_get();
-    pressure_store(pressure);
+    rt_uint32_t e;
 
-    rt_err_t err = rt_thread_suspend(pressure_thread);
+    while(1){
 
-    if (err != RT_EOK) {
-        //some error has occurred, fix
+        rt_kprintf("In pressure handler \n");
+
+        int pressure = pressure_get();
+        pressure_store(pressure);
+        rt_kprintf("Pressure %d \n", pressure);
+
+
+        if (rt_event_recv(&event,
+                          EVENT_FLAG3,
+                          RT_EVENT_FLAG_OR | RT_EVENT_FLAG_CLEAR,
+                          RT_WAITING_FOREVER, &e) == RT_EOK)
+        { rt_kprintf("Event received pressure thread. \n", e); }
+
     }
-
-    rt_schedule();
 
     return;
 }
 
 static void start_thread(void *param){
-    rt_kprintf("start_thread");
-    rt_err_t err = rt_thread_startup(pressure_thread);
-    if (err != 0){rt_kprintf("mistake");}
+
+    rt_event_send(&event, EVENT_FLAG3);
+
     return;
 }
 
