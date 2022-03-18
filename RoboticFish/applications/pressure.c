@@ -11,19 +11,25 @@
 #include <rtthread.h>
 #include "pressure.h"
 #include <stdlib.h>
+#include "board.h"
+#include "stm32f4xx_hal.h"
 
 #define THREAD_PRIORITY         2
 #define THREAD_STACK_SIZE       512
 #define THREAD_TIMESLICE        1
-#define TIMEOUT                 2000  //75 ms
-#define EVENT_FLAG3 (1 << 3)
+#define TIMEOUT                 2000  //TODO 75 ms
+#define EVENT_FLAG3             (1 << 3)
+#define MEM_START_ADDR          0x70000000
+#define ADDR_FLASH_SECTOR_4     ((uint32_t)0x08010000) /* Base @ of Sector 4, 64 Kbytes */
+
 
 static rt_thread_t pressure_thread = RT_NULL;
 static struct rt_event event;
 
 /* Thread Sample */
 int pressure_init(void){
-    // EVENT
+
+    // EVENT INIT
     rt_err_t err = rt_event_init(&event, "event", RT_IPC_FLAG_FIFO);
     if (err != RT_EOK)
     {
@@ -61,13 +67,25 @@ int pressure_init(void){
 static int pressure_get(void) {
     // Read and return pressure from device
     // Mock function
-    int r = rand() % 255;
+    u_int16_t r = rand() % 1024;
 
     return r;
 }
 
-static void pressure_store(int pressure) {
-    // store temp to memory
+//fair å bare lagre en byte for 254 psi tilsvarer
+static void pressure_store(u_int16_t pressure) {
+    static int flash_addr = ADDR_FLASH_SECTOR_4;
+    // Unlock flash memory
+    HAL_FLASH_Unlock();
+
+    // FLASH_Program_HalfWord(uint32_t Address, uint16_t Data);
+    FLASH_Program_HalfWord(flash_addr, pressure);
+
+    // Lock flash memory
+    HAL_FLASH_Lock();
+
+    flash_addr += 16;
+
     return;
 }
 
@@ -100,5 +118,18 @@ static void start_thread(void *param){
     rt_event_send(&event, EVENT_FLAG3);
 
     return;
+}
+
+static void FLASH_Program_HalfWord(uint32_t Address, uint16_t Data)
+{
+  /* Check the parameters */
+  assert_param(IS_FLASH_ADDRESS(Address));
+
+  /* If the previous operation is completed, proceed to program the new data */
+  CLEAR_BIT(FLASH->CR, FLASH_CR_PSIZE);
+  FLASH->CR |= FLASH_PSIZE_HALF_WORD;
+  FLASH->CR |= FLASH_CR_PG;
+
+  *(__IO uint16_t*)Address = Data;
 }
 
