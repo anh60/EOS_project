@@ -14,9 +14,11 @@
 
 int pressure_init(void);
 static int pressure_get(void);
-static void pressure_store(int pressure);
+static void pressure_store(u_int32_t pressure);
 static void pressure_handler(void *param);
 static void start_thread(void *param);
+static void FLASH_Program_Word(uint32_t Address, uint32_t Data);
+static uint32_t rearrange4mem(uint32_t data);
 
 
 #endif /* APPLICATIONS_PRESSURE_H_ */

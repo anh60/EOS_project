@@ -67,19 +67,20 @@ int pressure_init(void){
 static int pressure_get(void) {
     // Read and return pressure from device
     // Mock function
-    u_int16_t r = rand() % 1024;
+    u_int32_t r = rand() % 1024;
 
     return r;
 }
 
 //fair å bare lagre en byte for 254 psi tilsvarer
-static void pressure_store(u_int16_t pressure) {
+static void pressure_store(u_int32_t pressure) {
     static int flash_addr = ADDR_FLASH_SECTOR_4;
     // Unlock flash memory
+    //pressure = rearrange4mem(pressure);
     HAL_FLASH_Unlock();
 
-    // FLASH_Program_HalfWord(uint32_t Address, uint16_t Data);
-    FLASH_Program_HalfWord(flash_addr, pressure);
+    // FLASH_Program_HalfWord(uint32_t Address, uint32_t Data);
+    FLASH_Program_Word(flash_addr, pressure);
 
     // Lock flash memory
     HAL_FLASH_Lock();
@@ -120,16 +121,30 @@ static void start_thread(void *param){
     return;
 }
 
-static void FLASH_Program_HalfWord(uint32_t Address, uint16_t Data)
+static void FLASH_Program_Word(uint32_t Address, uint32_t Data)
 {
   /* Check the parameters */
   assert_param(IS_FLASH_ADDRESS(Address));
 
   /* If the previous operation is completed, proceed to program the new data */
   CLEAR_BIT(FLASH->CR, FLASH_CR_PSIZE);
-  FLASH->CR |= FLASH_PSIZE_HALF_WORD;
+  FLASH->CR |= FLASH_PSIZE_WORD;
   FLASH->CR |= FLASH_CR_PG;
 
-  *(__IO uint16_t*)Address = Data;
+  *(__IO uint32_t*)Address = Data;
+}
+
+//only needed if we are going to read back
+static uint32_t rearrange4mem(uint32_t data){
+    uint32_t tmp = data;
+    tmp &= 0x11000000;
+    tmp = tmp >> 6;
+
+    data &= 0x00110000;
+    data = data >> 2;
+
+    data |= tmp;
+
+    return data;
 }
 
