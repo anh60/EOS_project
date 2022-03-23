@@ -50,17 +50,6 @@ static void read_temp(void *param)
         // Temperature critically high, launch error handling
         if (sensor_temp->temperature > 200) {
 
-            // Initialize thread extr_temp
-             sensor_temp.extr_temp = rt_thread_create("extr_temp",           //Name
-                                                        handle_extr_temp,            //Function
-                                                        &sensor_temp,          //Object
-                                                        EXTR_TEMP_STACK_SIZE, //Stack size
-                                                        EXTR_TEMP_PRIORITY,   //Priority
-                                                        1                      //Ticks
-                                                        );
-             if(!sensor_temp.extr_temp)
-                 return RT_NULL;
-
             rt_thread_startup(sensor_temp->extr_temp);
 
         }
@@ -141,6 +130,16 @@ sensor_temp_t sensor_temp_init(void)
          return RT_NULL;
      rt_thread_startup(sensor_temp.store_temp);
 
+     // Initialize thread extr_temp
+     sensor_temp.extr_temp = rt_thread_create("extr_temp",           //Name
+                                                handle_extr_temp,            //Function
+                                                &sensor_temp,          //Object
+                                                EXTR_TEMP_STACK_SIZE, //Stack size
+                                                EXTR_TEMP_PRIORITY,   //Priority
+                                                1                      //Ticks
+                                                );
+     if(!sensor_temp.extr_temp)
+         return RT_NULL;
 
 
      /* Initialize timers */
