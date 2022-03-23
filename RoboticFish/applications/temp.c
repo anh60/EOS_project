@@ -4,8 +4,8 @@
 
 #include "temp.h"
 
-#define EVENT_FLAG1 (1 << 1)
-#define EVENT_FLAG2 (1 << 2)
+#define EVENT_FLAG1          (1 << 1)
+#define EVENT_FLAG2          (1 << 2)
 
 struct sensor_temp sensor_temp;
 rt_event_t event;
@@ -46,6 +46,25 @@ static void read_temp(void *param)
                     sensor_temp->temperature
                     );
         rt_exit_critical();
+
+        // Temperature critically high, launch error handling
+        if (sensor_temp->temperature > 200) {
+
+            // Initialize thread extr_temp
+             sensor_temp.extr_temp = rt_thread_create("extr_temp",           //Name
+                                                        handle_extr_temp,            //Function
+                                                        &sensor_temp,          //Object
+                                                        EXTR_TEMP_STACK_SIZE, //Stack size
+                                                        EXTR_TEMP_PRIORITY,   //Priority
+                                                        1                      //Ticks
+                                                        );
+             if(!sensor_temp.extr_temp)
+                 return RT_NULL;
+
+            rt_thread_startup(sensor_temp->extr_temp);
+
+        }
+
         rt_thread_delay(1000);
     }
 
@@ -71,11 +90,29 @@ static void store_temp(void *param)
     }
 }
 
+static void handle_extr_temp(void *param) {
+
+    rt_kprintf("Temperature too high! \n");
+
+    //TODO delay to cool down or block cpu from doing anything?
+    rt_thread_delay(1000);
+
+}
+
 /* Initialize temperature sensor */
 sensor_temp_t sensor_temp_init(void)
 {
    /* Initialize variable */
     sensor_temp.temperature = 0;
+
+    // TODO this is needed to initialize events
+    // EVENT INIT
+    rt_err_t err = rt_event_init(&event, "event", RT_IPC_FLAG_FIFO);
+    if (err != RT_EOK)
+    {
+        rt_kprintf("init event failed.\n");
+        return -1;
+    }
 
 
    /* Initialize thread 1 */
@@ -103,6 +140,7 @@ sensor_temp_t sensor_temp_init(void)
      if(!sensor_temp.store_temp)
          return RT_NULL;
      rt_thread_startup(sensor_temp.store_temp);
+
 
 
      /* Initialize timers */
