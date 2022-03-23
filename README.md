@@ -43,3 +43,4 @@ When a temperature above 200 degrees Celsius is detected the read_temp thread in
 
 
 ## Operative system enhancement 
+
