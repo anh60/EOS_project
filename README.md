@@ -37,6 +37,8 @@ To communicate between the two threads a servo motor object is created in the in
 ### Temperature sensor
 
 
+When a temperature above 200 degrees Celsius is detected the read_temp thread initializes and starts up an aperiodic task to handle the temperature irregularity executed by a thread extr_temp. This is done by .. . When the error handling is finished the thread is deleted. 
+
 ## Testing 
 
 
