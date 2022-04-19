@@ -1,19 +1,14 @@
-/*
- * Copyright (c) 2006-2021, RT-Thread Development Team
- *
- * SPDX-License-Identifier: Apache-2.0
- *
- * Contains functionality belonging to the fish' servo motors.
- * There are three servo motors in each joint of the fish' tail.
- * These servo motors requires reading of current position,
- * calculation of new position and setting of the calculated values.
- *
- * This tasks are done using a thread evoked by event sent by a timer.
- *
- * Change Logs:
- * Date           Author       Notes
- * 2022-03-04     Maja Markusson       the first version
+/**
+ * @file servo.c
+ * @author Maja Markusson
+ * @brief 
+ * @version 0.1
+ * @date 2022-04-18
+ * 
+ * @copyright Copyright (c) 2022
+ * 
  */
+
 #include "servo.h"
 #include <rtthread.h>
 #include "drv_common.h"
@@ -23,8 +18,8 @@
 #define THREAD_TIMESLICE        1
 
 //TODO Define ticks per millisecond
-#define TIMEOUT_SET             2000    // 50
-#define TIMEOUT_CALCULATE       1000    // 50?
+#define TIMEOUT_SET             100
+#define TIMEOUT_CALCULATE       400
 
 #define EVENT_FLAG3 (1 << 3)
 #define EVENT_FLAG4 (1 << 4)
@@ -82,7 +77,8 @@ int servo_init (void) {
     err = rt_timer_start(servo_timer_calculate);
     if (err != 0){ return -1;}
 
-    rt_hw_us_delay(40000);  //Delayed for 40 ms
+    //rt_hw_us_delay(4000);  //Delayed for 40 ms
+    //TODO this is not working; need a way to delay for 40 ms
 
     err = rt_timer_start(servo_timer_set);
     if (err != 0){ return -1; }
@@ -113,6 +109,9 @@ static void servo_set_positions(void *param) {
 static void servo_calculate_positions(void *param) {
     struct servo_motor *servo = param;
     rt_uint32_t e;
+
+    //this is the first delay to synchronize the execution of the two threads
+    rt_thread_delay(400);
 
     while(1){
 
