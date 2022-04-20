@@ -13,7 +13,7 @@
 #include "board.h"
 #include "stm32f4xx_hal.h"
 
-static void FLASH_Program_Word(uint32_t Address, uint32_t Data)
+void FLASH_Program_Word(uint32_t Address, uint32_t Data)
 {
   /* Check the parameters */
   assert_param(IS_FLASH_ADDRESS(Address));

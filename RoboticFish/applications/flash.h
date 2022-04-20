@@ -10,9 +10,12 @@
  */
 #include <rtdef.h>
 
-#ifndef APPLICATIONS_SERVO_H_
-#define APPLICATIONS_SERVO_H_
+#ifndef APPLICATIONS_FLASH_H_
+#define APPLICATIONS_FLASH_H_
 
 #define ADDR_FLASH_SECTOR_4     ((uint32_t)0x08010000) /* Base @ of Sector 4, 64 Kbytes */
 
-static void FLASH_Program_Word(uint32_t Address, uint32_t Data);
+void FLASH_Program_Word(uint32_t Address, uint32_t Data);
+static uint32_t rearrange4mem(uint32_t data);
+
+#endif /* APPLICATIONS_FLASH_H_ */
