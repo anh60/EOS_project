@@ -19,11 +19,14 @@ int main(void)
 
     //Initialize temperature sensor
     sensor_temp_1 = sensor_temp_init();
-
     if(!sensor_temp_1) {
         rt_kprintf("Failed to initialize temperature sensor");
         return RT_ERROR;
     }
+
+    //Start temperature sensor
+    sensor_temp_start(sensor_temp_1);
+
 
     int count = 1;
     while (count++)

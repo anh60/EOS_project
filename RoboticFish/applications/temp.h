@@ -40,8 +40,8 @@ typedef struct sensor_temp *sensor_temp_t;
 
 
 //Timer triggers
-static void timer_trigger_read_temp(void *param);
-static void timer_trigger_store_temp(void *param);
+//static void timer_trigger_read_temp(void *param);
+//static void timer_trigger_store_temp(void *param);
 
 //Threads
 static void read_temp(void *param);
@@ -50,5 +50,6 @@ static void handle_extr_temp(void *param);
 
 //Functions
 sensor_temp_t sensor_temp_init(void);
+void sensor_temp_start(void *param);
 
 #endif /* __TEMP_H__ */

@@ -211,7 +211,7 @@ static rt_err_t _rt_thread_init(struct rt_thread *thread,
                   rt_thread_timeout,
                   thread,
                   0,
-                  RT_TIMER_FLAG_ONE_SHOT);
+                  RT_TIMER_FLAG_PERIODIC);
 
     /* initialize signal */
 #ifdef RT_USING_SIGNALS
@@ -347,6 +347,7 @@ rt_err_t rt_thread_startup(rt_thread_t thread)
 }
 RTM_EXPORT(rt_thread_startup);
 
+
 /**
  * This function will detach a thread. The thread object will be removed from
  * thread queue and detached/deleted from system object management.
@@ -449,6 +450,7 @@ rt_thread_t rt_thread_create(const char *name,
     return thread;
 }
 RTM_EXPORT(rt_thread_create);
+
 
 /**
  * This function will delete a thread. The thread object will be removed from
@@ -896,3 +898,17 @@ rt_thread_t rt_thread_find(char *name)
 RTM_EXPORT(rt_thread_find);
 
 /**@}*/
+
+
+//Run this when doing a periodic task, where *f points to a function to execute
+void set_thread_periodic(void *param, rt_thread_t thread , int ACTION_PERIOD){
+    //execute function (entry) located in thread and pass the object
+    void (*entry)(void *param);
+    entry = thread->entry;
+
+    while(1)
+    {
+        entry(param);
+        rt_thread_sleep(ACTION_PERIOD);
+    }
+}
