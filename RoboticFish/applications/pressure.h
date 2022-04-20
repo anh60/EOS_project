@@ -2,7 +2,7 @@
  * @file pressure.h
  * @author Maja Markusson
  * @brief Functions and objects to calculate and set the position of servo motors given preplanned
- *        positions in dregrees. The functionality is implemented using independent threads for the
+ *        positions in degrees. The functionality is implemented using independent threads for the
  *        two tasks.
  * 
  * @version 0.1
