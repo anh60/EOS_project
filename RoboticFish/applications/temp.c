@@ -24,11 +24,11 @@ static void read_temp(void *param){
                       );
     rt_exit_critical();
 
+
     // Temperature critically high, launch error handling
     if (sensor_temp->temperature > 200) {
 
     //rt_thread_startup(sensor_temp->extr_temp);
-
     }
 }
 

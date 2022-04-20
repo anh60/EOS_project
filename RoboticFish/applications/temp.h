@@ -1,11 +1,13 @@
-/*
- * Copyright (c) 2006-2021, RT-Thread Development Team
- *
- * SPDX-License-Identifier: Apache-2.0
- *
- * Change Logs:
- * Date           Author       Notes
- * 2022-03-04     Maja Markusson       the first version
+/**
+ * @file temp.h
+ * @author Marcus Alexander Tjomsaas
+ * @brief Temperature sensor readings and storage as well as error handling for 
+ *        extreme temperatures.
+ * @version 0.1
+ * @date 2022-04-20
+ * 
+ * @copyright Copyright (c) 2022
+ * 
  */
 #ifndef __TEMP_H__
 #define __TEMP_H__
@@ -28,7 +30,10 @@
 #define EXTR_TEMP_ACTION_PERIOD 2000   /* 1 seconds = 1000 ticks */
 
 
-
+/**
+ * @brief Object containing indepentdent threads and the temperature variable 
+ *        to be passed between them. 
+ */
 struct sensor_temp {
     rt_thread_t read_temp;
     rt_thread_t store_temp;
@@ -40,15 +45,53 @@ typedef struct sensor_temp *sensor_temp_t;
 
 
 //Timer triggers
-//static void timer_trigger_read_temp(void *param);
-//static void timer_trigger_store_temp(void *param);
+
+/**
+ * @brief Function triggered by the correlating timer to resume the read_temp thread.
+ * 
+ * @param param sensor_temp object
+ */
+static void timer_trigger_read_temp(void *param);
+
+/**
+ * @brief Function triggered by the correlating timer to resume the store_temp thread. 
+ * 
+ * @param param sensor_temp object
+ */
+static void timer_trigger_store_temp(void *param);
+
 
 //Threads
+/**
+ * @brief Thread generating mock data to simulate readings from a temperature sensor. 
+ *        Changes the value of the temp value in the sensor_temp object passed into the function. 
+ *        Temperature values is in the range 0-256.
+ * 
+ * @param param temp_sensor object
+ */
 static void read_temp(void *param);
+
+/**
+ * @brief Stores temperature registered by the sensor to flash memory section 4 of the mcu. 
+ * 
+ * @param param temp_sensor object
+ */
 static void store_temp(void *param);
+
+/**
+ * @brief Thread to handle extreme temperatures. Executed aperiodically when
+ *        the registered temperature is above 200. 
+ * 
+ * @param param temp_sensor object
+ */
 static void handle_extr_temp(void *param);
 
 //Functions
+/**
+ * @brief Initializes and starts up timers and threads needed.  
+ * 
+ * @return sensor_temp_t 
+ */
 sensor_temp_t sensor_temp_init(void);
 void sensor_temp_start(void *param);
 
