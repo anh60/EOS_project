@@ -49,7 +49,7 @@ static void read_temp(void *param)
 
         // Temperature critically high, launch error handling
         if (sensor_temp->temperature > 200) {
-
+            // TODO needs initializing every time it is run. 
             rt_thread_startup(sensor_temp->extr_temp);
 
         }
