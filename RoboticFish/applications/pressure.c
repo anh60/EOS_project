@@ -16,7 +16,10 @@
 #define THREAD_PRIORITY         2
 #define THREAD_STACK_SIZE       512
 #define THREAD_TIMESLICE        1
-#define TIMEOUT                 2000  //TODO 75 ms
+
+#define TICKS_MS                10
+#define TIMEOUT                 (75 * TICKS_MS)
+
 #define EVENT_FLAG3             (1 << 3)
 
 
@@ -28,21 +31,17 @@ int pressure_init(void){
 
     // EVENT INIT
     rt_err_t err = rt_event_init(&event, "event", RT_IPC_FLAG_FIFO);
-    if (err != RT_EOK)
-    {
-        rt_kprintf("init event failed.\n");
-        return -1;
-    }
 
     static rt_timer_t pressure_timer;
 
+    // TIMER INIT
     pressure_timer = rt_timer_create("pressure_timer",
                                      start_thread,
                                      RT_NULL,
                                      TIMEOUT,
                                      RT_TIMER_FLAG_PERIODIC);
 
-    // Create thread
+    // THREAD INIT
     pressure_thread = rt_thread_create("pressure_thread",
                                         pressure_handler,
                                         pressure_thread,
@@ -51,12 +50,15 @@ int pressure_init(void){
                                         THREAD_TIMESLICE
                                         );
 
-    // Check that creation of thread was successful
-    if ( pressure_thread == RT_NULL) { return -1; }
+    
+    // ERROR CHECKS
+    if (err != RT_EOK){ return -1; }
+
+    if ( pressure_thread == RT_NULL) { return -2; }
     rt_thread_startup(pressure_thread);
 
     err = rt_timer_start(pressure_timer);
-    if (err != RT_NULL) {return -1;}
+    if (err != RT_NULL) {return -3;}
 
     return 0;
 }
@@ -64,24 +66,25 @@ int pressure_init(void){
 static int pressure_get(void) {
     // Read and return pressure from device
     // Mock function
-    u_int32_t r = rand() % 1024;
+    uint32_t r = rand() % 1024;
 
     return r;
 }
 
-//fair å bare lagre en byte for 254 psi tilsvarer
+// TODO how many bits do we need to store possible data values?
 static void pressure_store(u_int32_t pressure) {
+    
     static int flash_addr = ADDR_FLASH_SECTOR_4;
+    
     // Unlock flash memory
-    //pressure = rearrange4mem(pressure);
     HAL_FLASH_Unlock();
 
-    // FLASH_Program_HalfWord(uint32_t Address, uint32_t Data);
     FLASH_Program_Word(flash_addr, pressure);
 
     // Lock flash memory
     HAL_FLASH_Lock();
 
+    // 
     flash_addr += 16;
 
     return;
