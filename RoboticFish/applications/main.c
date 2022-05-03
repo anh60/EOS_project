@@ -11,9 +11,15 @@
  */
 
 #include "temp.h"
+#include "cpu.h"
 
 int main(void)
 {
+
+    rt_thread_t cpu_usage = init_cpu_usage_thread(cpu_usage);
+    start_cpu_usage_thread(cpu_usage);
+
+
     //Objects
     sensor_temp_t sensor_temp_1;
 
