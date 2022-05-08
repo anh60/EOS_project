@@ -36,8 +36,8 @@ int main(void)
     }
 
     //Start threads in objects
-    sensor_temp_start(sensor_temp_1);
     cpu_usage_start(cpu_usage_1);
+    sensor_temp_start(sensor_temp_1);
 
 
     int count = 1;

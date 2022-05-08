@@ -67,7 +67,7 @@ sensor_temp_t sensor_temp_init(void)
 
    /* Initialize thread 1 */
     sensor_temp.read_temp = rt_thread_create("read_temp",              //Name
-                                              read_temp,               //Function (Want to pass set_thread_periodic(void *param, rt_thread_t thread, int ACTION_PERIOD), how??
+                                              read_temp,               //Function (Want to pass (void *param, rt_thread_t thread, int ACTION_PERIOD), how??
                                               &sensor_temp,            //Object
                                               READ_TEMP_STACK_SIZE,    //Stack size
                                               READ_TEMP_PRIORITY,      //Priority
@@ -103,10 +103,11 @@ void sensor_temp_start(void *param)
 
     //Comment out the while loop and delay inside the thread to use this function
     //will currently block everything
-    /*  rt_thread_startup_periodic(&sensor_temp,            //Object
+    //This function should be the task itself passed when creating a thread
+      rt_thread_startup_periodic(&sensor_temp,          //Object
                                 sensor_temp->read_temp, //Thread
                                 READ_TEMP_ACTION_PERIOD //Repeat period
                                 );
-*/
+
 }
 

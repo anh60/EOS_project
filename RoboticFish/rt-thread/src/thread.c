@@ -907,6 +907,7 @@ void rt_thread_startup_periodic(void *param, rt_thread_t thread , int ACTION_PER
 
     //Start the thread
     rt_thread_startup(thread);
+    rt_thread_sleep(ACTION_PERIOD);
     //Execute periodically
     while(1)
     {
