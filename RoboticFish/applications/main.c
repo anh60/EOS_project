@@ -16,22 +16,28 @@
 int main(void)
 {
 
-    rt_thread_t cpu_usage = init_cpu_usage_thread(cpu_usage);
-    start_cpu_usage_thread(cpu_usage);
-
-
     //Objects
     sensor_temp_t sensor_temp_1;
+    cpu_t         cpu_usage_1;
 
-    //Initialize temperature sensor
+    //Initialize objects
+    //temperature sensor
     sensor_temp_1 = sensor_temp_init();
     if(!sensor_temp_1) {
         rt_kprintf("Failed to initialize temperature sensor");
         return RT_ERROR;
     }
 
-    //Start temperature sensor
+    //cpu usage
+    cpu_usage_1 = cpu_performance_init();
+    if(!cpu_usage_1) {
+        rt_kprintf("Failed to initialize cpu usage");
+        return RT_ERROR;
+    }
+
+    //Start threads in objects
     sensor_temp_start(sensor_temp_1);
+    cpu_usage_start(cpu_usage_1);
 
 
     int count = 1;

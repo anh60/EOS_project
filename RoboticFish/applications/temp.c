@@ -8,8 +8,8 @@ struct sensor_temp sensor_temp;
 
 
 /* Thread 1 */
-static void read_temp(void *param){
-
+static void read_temp(void *param)
+{
     /*Read temperature*/
     struct sensor_temp *sensor_temp = param;
 
@@ -102,10 +102,11 @@ void sensor_temp_start(void *param)
 
 
     //Comment out the while loop and delay inside the thread to use this function
-    rt_thread_startup_periodic(&sensor_temp,            //Object
+    //will currently block everything
+    /*  rt_thread_startup_periodic(&sensor_temp,            //Object
                                 sensor_temp->read_temp, //Thread
                                 READ_TEMP_ACTION_PERIOD //Repeat period
                                 );
-
+*/
 }
 

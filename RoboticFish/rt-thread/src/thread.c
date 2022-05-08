@@ -914,4 +914,4 @@ void rt_thread_startup_periodic(void *param, rt_thread_t thread , int ACTION_PER
         rt_thread_sleep(ACTION_PERIOD);
     }
 }
-RTM_EXPORT(rt_thread_find);
+RTM_EXPORT(rt_thread_startup_periodic);

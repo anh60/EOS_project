@@ -17,12 +17,12 @@
 
 #define ADC_NBITS 8;
 //READ_TEMP
-#define READ_TEMP_STACK_SIZE  1024
-#define READ_TEMP_PRIORITY 1
+#define READ_TEMP_STACK_SIZE    1024
+#define READ_TEMP_PRIORITY      2
 #define READ_TEMP_ACTION_PERIOD 500     /* 1 seconds = 1000 ticks */
 //STORE_TEMP
-#define STORE_TEMP_STACK_SIZE 1024
-#define STORE_TEMP_PRIORITY 2
+#define STORE_TEMP_STACK_SIZE    1024
+#define STORE_TEMP_PRIORITY      2
 #define STORE_TEMP_ACTION_PERIOD 2000   /* 1 seconds = 1000 ticks */
 
 /**
@@ -51,7 +51,7 @@ struct sensor_temp {
 typedef struct sensor_temp *sensor_temp_t;
 
 
-//Threads
+//THREADS
 /**
  * @brief Thread generating mock data to simulate readings from a temperature sensor. 
  *        Changes the value of the temp value in the sensor_temp object passed into the function. 
@@ -68,7 +68,7 @@ static void read_temp(void *param);
  */
 static void store_temp(void *param);
 
-//Functions
+//FUNCTIONS
 /**
  * @brief Initializes and starts up timers and threads needed.  
  * 
