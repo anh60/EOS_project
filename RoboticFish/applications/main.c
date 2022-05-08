@@ -32,6 +32,7 @@ int main(void)
     while (count++)
     {
         rt_kprintf("ADC TEMP: %d \n", sensor_temp_1->temperature);
+        if(sensor_temp_1->flag == 1) rt_kprintf("Temperature is too hot! \n");
         rt_thread_mdelay(1000);
     }
 

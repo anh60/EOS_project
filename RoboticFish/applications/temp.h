@@ -24,41 +24,31 @@
 #define STORE_TEMP_STACK_SIZE 1024
 #define STORE_TEMP_PRIORITY 2
 #define STORE_TEMP_ACTION_PERIOD 2000   /* 1 seconds = 1000 ticks */
-//EXTR_TEMP
-#define EXTR_TEMP_STACK_SIZE 1024
-#define EXTR_TEMP_PRIORITY 4           //TODO denne må ha høyere prioritet
-#define EXTR_TEMP_ACTION_PERIOD 2000   /* 1 seconds = 1000 ticks */
-
 
 /**
- * @brief Object containing indepentdent threads and the temperature variable 
+ * @brief Object containing independent threads and the temperature variable
  *        to be passed between them. 
  */
 struct sensor_temp {
     rt_thread_t read_temp;
     rt_thread_t store_temp;
-    rt_thread_t extr_temp;
 
-    int temperature;
+    uint8_t temperature;
+    uint8_t flag;
+    /* FLAGS:
+     * BITS |DESCRIPTION
+     * 1    |Triggered when temperature is dangerously hot
+     * 2    |Undefined
+     * 3    |Undefined
+     * 4    |Undefined
+     * 5    |Undefined
+     * 6    |Undefined
+     * 7    |Undefined
+     * 8    |Undefined
+     */
+
 };
 typedef struct sensor_temp *sensor_temp_t;
-
-
-//Timer triggers
-
-/**
- * @brief Function triggered by the correlating timer to resume the read_temp thread.
- * 
- * @param param sensor_temp object
- */
-static void timer_trigger_read_temp(void *param);
-
-/**
- * @brief Function triggered by the correlating timer to resume the store_temp thread. 
- * 
- * @param param sensor_temp object
- */
-static void timer_trigger_store_temp(void *param);
 
 
 //Threads
@@ -77,14 +67,6 @@ static void read_temp(void *param);
  * @param param temp_sensor object
  */
 static void store_temp(void *param);
-
-/**
- * @brief Thread to handle extreme temperatures. Executed aperiodically when
- *        the registered temperature is above 200. 
- * 
- * @param param temp_sensor object
- */
-static void handle_extr_temp(void *param);
 
 //Functions
 /**

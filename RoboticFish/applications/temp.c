@@ -9,27 +9,32 @@ struct sensor_temp sensor_temp;
 
 /* Thread 1 */
 static void read_temp(void *param){
+
     /*Read temperature*/
     struct sensor_temp *sensor_temp = param;
 
-    rt_enter_critical();
-    //Generate random ADC value from 0 to 2^NBIT
-    int range = 1 << ADC_NBITS;
-    int temp = rand() % range;
-    sensor_temp->temperature = temp;
+    //Do periodic thread
+    //while(1)
+    //{
+        rt_enter_critical();
+        sensor_temp->flag = 0;
+        //Generate random ADC value from 0 to 2^NBIT
+        int range = 1 << ADC_NBITS;
+        int temp = rand() % range;
+        sensor_temp->temperature = temp;
 
-    rt_kprintf("Running read_temp at ticks %d and reading variable %d \n",
+        rt_kprintf("Running read_temp at ticks %d and reading variable %d \n",
                       rt_tick_get(),
                       sensor_temp->temperature
                       );
-    rt_exit_critical();
+        rt_exit_critical();
 
 
-    // Temperature critically high, launch error handling
-    if (sensor_temp->temperature > 200) {
+        // Temperature critically high, launch error handling
+        if (sensor_temp->temperature > 200) sensor_temp->flag = 1;
 
-    //rt_thread_startup(sensor_temp->extr_temp);
-    }
+        //rt_thread_delay(READ_TEMP_ACTION_PERIOD);
+    //}
 }
 
 
@@ -52,14 +57,6 @@ static void store_temp(void *param)
     }
 }
 
-static void handle_extr_temp(void *param) {
-
-    rt_kprintf("Temperature too high! \n");
-
-    //TODO delay to cool down or block cpu from doing anything?
-    rt_thread_delay(1000);
-
-}
 
 /* Initialize temperature sensor */
 sensor_temp_t sensor_temp_init(void)
@@ -70,7 +67,7 @@ sensor_temp_t sensor_temp_init(void)
 
    /* Initialize thread 1 */
     sensor_temp.read_temp = rt_thread_create("read_temp",              //Name
-                                              read_temp,               //Function
+                                              read_temp,               //Function (Want to pass set_thread_periodic(void *param, rt_thread_t thread, int ACTION_PERIOD), how??
                                               &sensor_temp,            //Object
                                               READ_TEMP_STACK_SIZE,    //Stack size
                                               READ_TEMP_PRIORITY,      //Priority
@@ -94,19 +91,6 @@ sensor_temp_t sensor_temp_init(void)
          return RT_NULL;
 
 
-     /* Initialize thread extr_temp
-     sensor_temp.extr_temp = rt_thread_create("extr_temp",           //Name
-                                                handle_extr_temp,            //Function
-                                                &sensor_temp,          //Object
-                                                EXTR_TEMP_STACK_SIZE, //Stack size
-                                                EXTR_TEMP_PRIORITY,   //Priority
-                                                1                      //Ticks
-                                                );
-     if(!sensor_temp.extr_temp)
-         return RT_NULL;
-     rt_thread_startup(sensor_temp.extr_temp);*/
-
-
     return &sensor_temp;
 }
 
@@ -117,6 +101,7 @@ void sensor_temp_start(void *param)
     rt_thread_startup(sensor_temp->store_temp);
     rt_thread_startup(sensor_temp->read_temp);
 
+    //Comment out the while loop and delay inside the thread to use this function
     set_thread_periodic(&sensor_temp,           //Object
                         sensor_temp->read_temp,  //Thread
                         READ_TEMP_ACTION_PERIOD //Repeat period
