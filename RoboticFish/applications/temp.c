@@ -24,13 +24,13 @@ static void read_temp(void *param)
         sensor_temp->temperature = temp;
 
         rt_kprintf("Running read_temp at ticks %d and reading variable %d \n",
-                      rt_tick_get(),
-                      sensor_temp->temperature
-                      );
+                    rt_tick_get(),
+                    sensor_temp->temperature
+                    );
         rt_exit_critical();
 
 
-        // Temperature critically high, launch error handling
+        // Temperature critically high, trigger sensor flag
         if (sensor_temp->temperature > 200) sensor_temp->flag = 1;
 
         //rt_thread_delay(READ_TEMP_ACTION_PERIOD);
@@ -49,7 +49,8 @@ static void store_temp(void *param)
         rt_enter_critical();
         rt_kprintf("Running store_temp at ticks %d and storing variable %d \n",
                     rt_tick_get(),
-                    sensor_temp->temperature);
+                    sensor_temp->temperature
+                    );
 
         rt_exit_critical();
 
@@ -103,11 +104,11 @@ void sensor_temp_start(void *param)
 
     //Comment out the while loop and delay inside the thread to use this function
     //will currently block everything
-    //This function should be the task itself passed when creating a thread
+    //This function should be the thread passed when creating a thread
       rt_thread_startup_periodic(&sensor_temp,          //Object
-                                sensor_temp->read_temp, //Thread
-                                READ_TEMP_ACTION_PERIOD //Repeat period
-                                );
+                                 sensor_temp->read_temp, //Thread
+                                 READ_TEMP_ACTION_PERIOD //Repeat period
+                                 );
 
 }
 
