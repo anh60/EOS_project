@@ -99,13 +99,13 @@ void sensor_temp_start(void *param)
     struct sensor_temp *sensor_temp = param;
 
     rt_thread_startup(sensor_temp->store_temp);
-    rt_thread_startup(sensor_temp->read_temp);
+
 
     //Comment out the while loop and delay inside the thread to use this function
-    set_thread_periodic(&sensor_temp,           //Object
-                        sensor_temp->read_temp,  //Thread
-                        READ_TEMP_ACTION_PERIOD //Repeat period
-                        );
+    rt_thread_startup_periodic(&sensor_temp,            //Object
+                                sensor_temp->read_temp, //Thread
+                                READ_TEMP_ACTION_PERIOD //Repeat period
+                                );
 
 }
 

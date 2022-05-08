@@ -900,15 +900,18 @@ RTM_EXPORT(rt_thread_find);
 /**@}*/
 
 
-//Run this when doing a periodic task, where *f points to a function to execute
-void set_thread_periodic(void *param, rt_thread_t thread , int ACTION_PERIOD){
-    //execute function (entry) located in thread and pass the object
+void rt_thread_startup_periodic(void *param, rt_thread_t thread , int ACTION_PERIOD){
+    //Function pointer
     void (*entry)(void *param);
     entry = thread->entry;
 
+    //Start the thread
+    rt_thread_startup(thread);
+    //Execute periodically
     while(1)
     {
         entry(param);
         rt_thread_sleep(ACTION_PERIOD);
     }
 }
+RTM_EXPORT(rt_thread_find);
