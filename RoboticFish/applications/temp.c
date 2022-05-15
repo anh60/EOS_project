@@ -95,6 +95,7 @@ sensor_temp_t sensor_temp_init(void)
     return &sensor_temp;
 }
 
+/* Start threads */
 void sensor_temp_start(void *param)
 {
     struct sensor_temp *sensor_temp = param;

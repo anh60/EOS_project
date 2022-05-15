@@ -7,7 +7,9 @@
 
 struct cpu cpu;
 
-static void print_cpu_usage(void* param){
+/* Thread 1 */
+static void print_cpu_usage(void* param)
+{
     struct cpu *cpu = param;
 
     //Test
@@ -25,7 +27,9 @@ static void print_cpu_usage(void* param){
     }
 }
 
-cpu_t cpu_performance_init(void){
+/* Initialize CPU usage */
+cpu_t cpu_performance_init(void)
+{
    cpu.print_cpu_usage = rt_thread_create("cpu_usage",                  //Name
                                           print_cpu_usage,                //Function
                                           &cpu,                      //Object
@@ -40,7 +44,9 @@ cpu_t cpu_performance_init(void){
    return &cpu;
 }
 
-void cpu_usage_start(void *param){
+/* Start threads */
+void cpu_usage_start(void *param)
+{
     struct cpu *cpu = param;
 
     rt_thread_startup(cpu->print_cpu_usage);
