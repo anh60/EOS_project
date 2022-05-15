@@ -63,7 +63,7 @@ static void servo_set_positions(void *param);
  * 
  * @param param servo object. 
  */
-static void servo_calculate_positions(void *param);
+static void servo_calculate_positions(void *param,  int servo_value_array[]);
 
 
 /**
@@ -79,5 +79,16 @@ static void start_thread_set(void *param);
  * @param param servo object. 
  */
 static void start_thread_calculate(void *param);
+
+/**
+ * @brief Function to convert predefined degree measurements to PWM signals that can be applied to
+ *        a servomotor. Resolution is set to
+ *
+ * @param int value in degrees to be converted to PWM duty cycles
+ * @param int resolution measured in
+ *
+ * @return int PWM duty cycle
+ */
+static int degToPWM(int valDeg);
 
 #endif /* APPLICATIONS_SERVO_H_ */

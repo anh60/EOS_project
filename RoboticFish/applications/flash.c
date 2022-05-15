@@ -27,7 +27,7 @@ void FLASH_Program_Word(uint32_t Address, uint32_t Data)
 }
 
 //only needed if we are going to read back
-static uint32_t rearrangeMemoryVal(uint32_t Data){
+uint32_t rearrangeMemoryVal(uint32_t data){
     uint32_t tmp = data;
     tmp &= 0x11000000;
     tmp = tmp >> 6;
