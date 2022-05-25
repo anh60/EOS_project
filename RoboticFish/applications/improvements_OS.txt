@@ -1,4 +1,0 @@
-Suggestions for improvement
-- delayed timers
-- alarms or events for timers
-- make an option to move from closed to ready

@@ -16,7 +16,7 @@ def load(filename):
 if __name__ == '__main__':
     range = (0, 99)
     bins = 10
-    data = load('benchmarking/benchmarks.txt')
+    data = load('benchmarks.txt')
 
     # CALCULATE MEAN
     CPU_usage_mean = data.mean(0)
