@@ -30,6 +30,7 @@ struct servo_motor {
     rt_thread_t servo_thread_set;
 
     int servo_value[3];
+    int servo_value_array[10];
 };
 
 typedef struct servo_motor *servo_motor_p;
@@ -63,7 +64,7 @@ static void servo_set_positions(void *param);
  * 
  * @param param servo object. 
  */
-static void servo_calculate_positions(void *param,  int servo_value_array[]);
+static void servo_calculate_positions(void *param);
 
 
 /**

@@ -25,7 +25,6 @@
 
 static struct rt_event event;
 struct servo_motor servo;
-static int servo_value_array = {1, 2, 3, 4, 7, 110, 18, 23, 98, 146, 180, 55};
 
 int servo_init (void) {
     
@@ -110,10 +109,11 @@ static void servo_set_positions(void *param) {
     return;
 }
 
-static void servo_calculate_positions(void *param, int servo_value_array[]) {
+static void servo_calculate_positions(void *param) {
     struct servo_motor *servo = param;
     rt_uint32_t e;
     static int array_offset = 0;
+    int *servo_value_array = servo->servo_value_array;
 
     // This is the first delay to synchronize the execution of the two threads
     rt_thread_delay(40 * TICKS_MS);
