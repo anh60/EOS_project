@@ -31,10 +31,7 @@ int servo_init (void) {
     // EVENT HANDLING
     rt_err_t err = rt_event_init(&event, "event", RT_IPC_FLAG_FIFO);
     if (err != RT_EOK)
-    {
-        rt_kprintf("init event failed.\n");
-        return -1;
-    }
+    {return -1; }
 
     // TIMER HANDLING
     rt_timer_t servo_timer_set = rt_timer_create("servo_timer_set",
@@ -97,13 +94,15 @@ static void servo_set_positions(void *param) {
 
     while(1){
 
-        rt_kprintf("In set position thread \n");
+        rt_kprintf("In set position thread \n");                        //for debugging
+
+        //set set voltage signals based on servo_value array
 
         if (rt_event_recv(&event,
                           EVENT_FLAG3,
                           RT_EVENT_FLAG_OR | RT_EVENT_FLAG_CLEAR,
                           RT_WAITING_FOREVER, &e) == RT_EOK)
-        { rt_kprintf("Event received servo set thread. \n", e); }
+        { rt_kprintf("Event received servo set thread. \n", e); }       //for debugging
 
     }
 
@@ -113,23 +112,34 @@ static void servo_set_positions(void *param) {
 static void servo_calculate_positions(void *param) {
     struct servo_motor *servo = param;
     rt_uint32_t e;
+    static int array_offset = 0;
+    int *servo_value_array = servo->servo_value_array;
 
-    //this is the first delay to synchronize the execution of the two threads
+    // This is the first delay to synchronize the execution of the two threads
     rt_thread_delay(40 * TICKS_MS);
+
+    // A possibility is to open a file and read from it or can it just be retrived from prog.mem
+    // need to produce a PWM signal from degrees to ms
 
     while(1){
 
-        servo->servo_value[0] = 0;
-        servo->servo_value[1] = 1;
-        servo->servo_value[2] = 2;
+        int servo1 = degToPWM(servo_value_array[array_offset]);
+        int servo2 = degToPWM(servo_value_array[array_offset + 1]);
+        int servo3 = degToPWM(servo_value_array[array_offset + 2]);
 
-        rt_kprintf("In servo calculation thread \n");
+        array_offset = array_offset + 3;
+
+        servo->servo_value[0] = servo1;
+        servo->servo_value[1] = servo2;
+        servo->servo_value[2] = servo3;
+
+        rt_kprintf("In servo calculation thread \n");                   //for debugging
 
         if (rt_event_recv(&event,
                           EVENT_FLAG4,
                           RT_EVENT_FLAG_OR | RT_EVENT_FLAG_CLEAR,
                           RT_WAITING_FOREVER, &e) == RT_EOK)
-        { rt_kprintf("Event received servo calc. thread. \n", e); }
+        { rt_kprintf("Event received servo calc. thread. \n", e); }     //for debugging
     }
 }
 
@@ -141,6 +151,16 @@ static void start_thread_set(void *param){
 static void start_thread_calculate(void *param){
     rt_event_send(&event, EVENT_FLAG4);
     return;
+}
+
+static int degToPWM(int valDeg) {
+    //0 = 500 us
+    //180 = 2500 us
+    // theoretical precision to 0.09
+
+    int pwm = (valDeg / 0.09) + 500;
+
+    return pwm;
 }
 
 

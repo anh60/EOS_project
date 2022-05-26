@@ -30,6 +30,7 @@ struct servo_motor {
     rt_thread_t servo_thread_set;
 
     int servo_value[3];
+    int servo_value_array[10];
 };
 
 typedef struct servo_motor *servo_motor_p;
@@ -79,5 +80,16 @@ static void start_thread_set(void *param);
  * @param param servo object. 
  */
 static void start_thread_calculate(void *param);
+
+/**
+ * @brief Function to convert predefined degree measurements to PWM signals that can be applied to
+ *        a servomotor. Resolution is set to
+ *
+ * @param int value in degrees to be converted to PWM duty cycles
+ * @param int resolution measured in
+ *
+ * @return int PWM duty cycle
+ */
+static int degToPWM(int valDeg);
 
 #endif /* APPLICATIONS_SERVO_H_ */
