@@ -917,8 +917,8 @@ void nextPeriodicThread(void* param){
         //Execute periodically
         while(1)
         {
-            sensor_temp->function_pointers[current_thread](param);
-            rt_thread_sleep(sensor_temp->action_period[current_thread]);
+            sensor_temp->function_pointers[current_thread](param);        //Function being executed
+            rt_thread_sleep(sensor_temp->action_period[current_thread]);  //Sleep time
         }
     }
 }
