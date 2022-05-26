@@ -14,8 +14,8 @@
 
 #include <rtdef.h>
 
-
-#define ADC_NBITS 8;
+#define TOTAL_THREADS 2
+#define ADC_NBITS 8
 //READ_TEMP
 #define READ_TEMP_STACK_SIZE    1024
 #define READ_TEMP_PRIORITY      2
@@ -25,16 +25,25 @@
 #define STORE_TEMP_PRIORITY      2
 #define STORE_TEMP_ACTION_PERIOD 2000   /* 1 seconds = 1000 ticks */
 
+
 /**
  * @brief Object containing independent threads and the temperature variable
  *        to be passed between them. 
  */
+#define SENSOR_TEMP 2
 struct sensor_temp {
-    rt_thread_t read_temp;
-    rt_thread_t store_temp;
-
+    uint8_t type;           //type goes first
     uint8_t temperature;
+    uint8_t active_threads;
+
+    rt_thread_t threads[TOTAL_THREADS];
+    /*Functions to execute in periodic thread*/
+    void (*function_pointers[TOTAL_THREADS])(void *parameter);
+    /*Action period for periodic thread*/
+    uint16_t action_period[TOTAL_THREADS];
+
     uint8_t flag;
+
     /* FLAGS:
      * BITS |DESCRIPTION
      * 1    |Triggered when temperature is dangerously hot

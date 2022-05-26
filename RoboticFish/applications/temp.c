@@ -62,33 +62,42 @@ static void store_temp(void *param)
 /* Initialize temperature sensor */
 sensor_temp_t sensor_temp_init(void)
 {
-   /* Initialize variable */
-    sensor_temp.temperature = 0;
+   /* Initialize struct variables */
+    sensor_temp.type                 = SENSOR_TEMP;
+    sensor_temp.temperature          = 0;
+    sensor_temp.active_threads       = 0;
+   /* Initialize thread variables */
+    sensor_temp.function_pointers[TOTAL_THREADS-1] = read_temp;
+    sensor_temp.function_pointers[TOTAL_THREADS-2] = store_temp;
+    sensor_temp.action_period[TOTAL_THREADS-1]     = READ_TEMP_ACTION_PERIOD;
+    sensor_temp.action_period[TOTAL_THREADS-2]     = STORE_TEMP_ACTION_PERIOD;
+
 
 
    /* Initialize thread 1 */
-    sensor_temp.read_temp = rt_thread_create("read_temp",              //Name
-                                              read_temp,               //Function (Want to pass (void *param, rt_thread_t thread, int ACTION_PERIOD), how??
+    sensor_temp.threads[TOTAL_THREADS-1] = rt_thread_create("read_temp",              //Name
+                                              nextPeriodicThread,               //Function (Want to pass (void *param, rt_thread_t thread, int ACTION_PERIOD), how??
                                               &sensor_temp,            //Object
                                               READ_TEMP_STACK_SIZE,    //Stack size
                                               READ_TEMP_PRIORITY,      //Priority
                                               1
                                               );
 
-    if(!sensor_temp.read_temp)
+    if(!sensor_temp.threads[TOTAL_THREADS-1])
         return RT_NULL;
 
 
 
     /* Initialize thread 2 */
-     sensor_temp.store_temp = rt_thread_create("store_temp",           //Name
-                                                store_temp,            //Function
-                                                &sensor_temp,          //Object
-                                                STORE_TEMP_STACK_SIZE, //Stack size
-                                                STORE_TEMP_PRIORITY,   //Priority
-                                                1                      //Ticks
-                                                );
-     if(!sensor_temp.store_temp)
+     sensor_temp.threads[TOTAL_THREADS-2] = rt_thread_create("store_temp",              //Name
+                                               nextPeriodicThread,               //Function (Want to pass (void *param, rt_thread_t thread, int ACTION_PERIOD), how??
+                                               &sensor_temp,            //Object
+                                               STORE_TEMP_STACK_SIZE,    //Stack size
+                                               STORE_TEMP_PRIORITY,      //Priority
+                                               1
+                                               );
+
+     if(!sensor_temp.threads[TOTAL_THREADS-2])
          return RT_NULL;
 
 
@@ -100,16 +109,13 @@ void sensor_temp_start(void *param)
 {
     struct sensor_temp *sensor_temp = param;
 
-    rt_thread_startup(sensor_temp->store_temp);
-
+    rt_thread_startup(sensor_temp->threads[TOTAL_THREADS-1]);
+    rt_thread_startup(sensor_temp->threads[TOTAL_THREADS-2]);
 
     //Comment out the while loop and delay inside the thread to use this function
     //will currently block everything
     //This function should be the thread passed when creating a thread
-      rt_thread_startup_periodic(&sensor_temp,          //Object
-                                 sensor_temp->read_temp, //Thread
-                                 READ_TEMP_ACTION_PERIOD //Repeat period
-                                 );
+     // rt_thread_startup_periodic(sensor_temp);
 
 }
 
