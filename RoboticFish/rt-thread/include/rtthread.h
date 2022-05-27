@@ -571,7 +571,7 @@ void rt_assert_handler(const char *ex, const char *func, rt_size_t line);
 #include <finsh_api.h>
 #endif
 
-void nextPeriodicThread(void *param);
+void next_periodic_thread(void *param);
 /**@}*/
 
 #ifdef __cplusplus

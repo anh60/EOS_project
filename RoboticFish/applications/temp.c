@@ -22,12 +22,13 @@ static void read_temp(void *param)
 
         // Temperature critically high, trigger sensor flag
         if (sensor_temp->temperature > 200) sensor_temp->flag = 1;
-    rt_exit_critical();
+
 
     rt_kprintf("Running read_temp at ticks %d and reading variable %d \n",
                 rt_tick_get(),
                 sensor_temp->temperature
                 );
+    rt_exit_critical();
 }
 
 
@@ -65,7 +66,7 @@ sensor_temp_t sensor_temp_init(void)
 
    /* Initialize thread 1 */
     sensor_temp.threads[TOTAL_THREADS-1] = rt_thread_create("read_temp",    //Name
-                                              nextPeriodicThread,           //Thread
+                                              next_periodic_thread,         //Thread
                                               &sensor_temp,                 //Object
                                               READ_TEMP_STACK_SIZE,         //Stack size
                                               READ_TEMP_PRIORITY,           //Priority
@@ -79,7 +80,7 @@ sensor_temp_t sensor_temp_init(void)
 
     /* Initialize thread 2 */
      sensor_temp.threads[TOTAL_THREADS-2] = rt_thread_create("store_temp",  //Name
-                                               nextPeriodicThread,          //Thread
+                                               next_periodic_thread,        //Thread
                                                &sensor_temp,                //Object
                                                STORE_TEMP_STACK_SIZE,       //Stack size
                                                STORE_TEMP_PRIORITY,         //Priority
