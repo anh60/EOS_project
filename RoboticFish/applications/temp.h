@@ -13,11 +13,8 @@
 #define __TEMP_H__
 
 #include <rtdef.h>
+#include "base.h"
 
-
-//STRUCT
-#define TOTAL_THREADS 2
-#define SENSOR_TEMP 2
 //READ_TEMP
 #define ADC_NBITS 8
 #define READ_TEMP_STACK_SIZE    1024
@@ -35,17 +32,8 @@
  */
 
 struct sensor_temp {
-    //Type needs to be first
-    uint8_t type;
+    base_struct base;
     uint8_t temperature;
-    uint8_t active_threads;
-
-    rt_thread_t threads[TOTAL_THREADS];
-    /*Functions to execute in periodic thread*/
-    void (*function_pointers[TOTAL_THREADS])(void *parameter);
-    /*Action period for periodic thread*/
-    uint16_t action_period[TOTAL_THREADS];
-
     uint8_t flag;
     /* FLAGS:
      * BITS |DESCRIPTION
@@ -71,14 +59,14 @@ typedef struct sensor_temp *sensor_temp_t;
  * 
  * @param param temp_sensor object
  */
-static void read_temp(void *param);
+void read_temp(void *param);
 
 /**
  * @brief Stores temperature registered by the sensor to flash memory section 4 of the mcu. 
  * 
  * @param param temp_sensor object
  */
-static void store_temp(void *param);
+void store_temp(void *param);
 
 //FUNCTIONS
 /**

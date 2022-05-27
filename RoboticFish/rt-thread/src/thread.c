@@ -30,7 +30,7 @@
 
 #include <rthw.h>
 #include <rtthread.h>
-#include "temp.h"
+#include "base.h"
 
 extern rt_list_t rt_thread_defunct;
 
@@ -901,31 +901,20 @@ RTM_EXPORT(rt_thread_find);
 /**@}*/
 
 
-void next_periodic_thread(void* param){
+void next_periodic_thread(void* param)
+{
     //Get the value of the first member in the struct
-    uint8_t type = *(uint8_t*)param;
+    base_struct *base = (base_struct *)param;
 
+    //Update active threads
+    uint8_t current_thread = TOTAL_THREADS - base->active_threads -1;
+    base->active_threads = base->active_threads + 1;
 
-    //Check for struct type and execute
-    switch(type)
+    //Execute periodically
+    while(1)
     {
-        case SENSOR_TEMP:   ;/*Execute sensor_temp thread*/
-                            struct sensor_temp *sensor_temp = param;
-
-                            //Update active threads
-                            uint8_t current_thread = TOTAL_THREADS - sensor_temp->active_threads -1;
-                            sensor_temp->active_threads = sensor_temp->active_threads + 1;
-
-                            //Execute periodically
-                            while(1)
-                            {
-                                sensor_temp->function_pointers[current_thread](param);        //Function being executed
-                                rt_thread_sleep(sensor_temp->action_period[current_thread]);  //Sleep time
-                            }
-                            break;
-
-        default:            ;/*CASE DOES NOT EXIST*/
-                            break;
+        base->function_pointers[current_thread](param);        //Function being executed
+        rt_thread_sleep(base->action_period[current_thread]);  //Sleep time
     }
 }
 RTM_EXPORT(rt_thread_startup_periodic);

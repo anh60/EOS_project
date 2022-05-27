@@ -15,36 +15,43 @@ static void print_cpu_usage(void* param)
     //FILE *file = fopen("benchmarks.txt", "a");
 
     //Test
-    cpu->major = 3;
-    cpu->minor = 1;
-    rt_kprintf("cpu usage = %d.%d\n", cpu->major, cpu->minor);
+    //cpu->major = 3;
+    //cpu->minor = 1;
+    //rt_kprintf("cpu usage = %d.%d\n", cpu->major, cpu->minor);
 
     //fprintf(file, "%d.%d\n", cpu->major, cpu->minor);
     //fclose(file);
 
     //Test end
 
-    while(1)
-    {
-        cpu_usage_get(&cpu->major, &cpu->minor);
-        rt_kprintf("cpu usage = %d.%d%\n",cpu->major,cpu->minor);
-        rt_thread_delay(PRINT_CPU_USAGE_ACTION_PERIOD);
-    }
+   cpu_usage_get(&cpu->major, &cpu->minor);
+   rt_kprintf("cpu usage = %d.%d%\n",cpu->major,cpu->minor);
+   rt_thread_delay(PRINT_CPU_USAGE_ACTION_PERIOD);
 }
 
 /* Initialize CPU usage */
 cpu_t cpu_performance_init(void)
 {
-   cpu.print_cpu_usage = rt_thread_create("cpu_usage",                  //Name
-                                          print_cpu_usage,              //Function
-                                          &cpu,                         //Object
-                                          PRINT_CPU_USAGE_STACK_SIZE,   //Stack size
-                                          PRINT_CPU_USAGE_PRIORITY,     //Priority
-                                          1                             //Ticks
-                                          );
+  /* Initialize cpu variables */
+    cpu.major           = 0;
+    cpu.minor           = 0;
+  /* Initialize base variables */
+    cpu.base.active_threads  = 0;
+    cpu.base.function_pointers[TOTAL_THREADS-1] = print_cpu_usage;
+    cpu.base.action_period[TOTAL_THREADS-1]     = PRINT_CPU_USAGE_ACTION_PERIOD;
 
-   if(!cpu.print_cpu_usage)
-           return RT_NULL;
+
+  /* Initialize thread 1 */
+    cpu.base.threads[TOTAL_THREADS-1] = rt_thread_create("print_cpu_usage",                //Name
+                                                  next_periodic_thread,         //Thread
+                                                  &cpu,                         //Object
+                                                  PRINT_CPU_USAGE_STACK_SIZE,   //Stack size
+                                                  PRINT_CPU_USAGE_PRIORITY,     //Priority
+                                                  1
+                                                  );
+
+    if(!cpu.base.threads[TOTAL_THREADS-1])
+        return RT_NULL;
 
    return &cpu;
 }
@@ -54,5 +61,5 @@ void cpu_usage_start(void *param)
 {
     struct cpu *cpu = param;
 
-    rt_thread_startup(cpu->print_cpu_usage);
+    rt_thread_startup(cpu->base.threads[TOTAL_THREADS-1]);
 }

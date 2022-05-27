@@ -8,7 +8,7 @@ struct sensor_temp sensor_temp;
 
 
 /* Thread 1 */
-static void read_temp(void *param)
+void read_temp(void *param)
 {
     /*Read temperature*/
     struct sensor_temp *sensor_temp = param;
@@ -33,7 +33,7 @@ static void read_temp(void *param)
 
 
 /* Thread 2 */
-static void store_temp(void *param)
+void store_temp(void *param)
 {
     /*Store temperature using store_temp*/
     struct sensor_temp *sensor_temp = param;
@@ -52,20 +52,20 @@ static void store_temp(void *param)
 /* Initialize temperature sensor */
 sensor_temp_t sensor_temp_init(void)
 {
-   /* Initialize struct variables */
-    sensor_temp.type                 = SENSOR_TEMP;
+   /* Initialize sensor variables */
     sensor_temp.temperature          = 0;
-    sensor_temp.active_threads       = 0;
-   /* Initialize thread variables */
-    sensor_temp.function_pointers[TOTAL_THREADS-1] = read_temp;
-    sensor_temp.function_pointers[TOTAL_THREADS-2] = store_temp;
-    sensor_temp.action_period[TOTAL_THREADS-1]     = READ_TEMP_ACTION_PERIOD;
-    sensor_temp.action_period[TOTAL_THREADS-2]     = STORE_TEMP_ACTION_PERIOD;
+    sensor_temp.flag                 = 0;
+   /* Initialize base variables */
+    sensor_temp.base.active_threads       = 0;
+    sensor_temp.base.function_pointers[TOTAL_THREADS-1] = read_temp;
+    sensor_temp.base.function_pointers[TOTAL_THREADS-2] = store_temp;
+    sensor_temp.base.action_period[TOTAL_THREADS-1]     = READ_TEMP_ACTION_PERIOD;
+    sensor_temp.base.action_period[TOTAL_THREADS-2]     = STORE_TEMP_ACTION_PERIOD;
 
 
 
    /* Initialize thread 1 */
-    sensor_temp.threads[TOTAL_THREADS-1] = rt_thread_create("read_temp",    //Name
+    sensor_temp.base.threads[TOTAL_THREADS-1] = rt_thread_create("read_temp",    //Name
                                               next_periodic_thread,         //Thread
                                               &sensor_temp,                 //Object
                                               READ_TEMP_STACK_SIZE,         //Stack size
@@ -73,13 +73,13 @@ sensor_temp_t sensor_temp_init(void)
                                               1
                                               );
 
-    if(!sensor_temp.threads[TOTAL_THREADS-1])
+    if(!sensor_temp.base.threads[TOTAL_THREADS-1])
         return RT_NULL;
 
 
 
     /* Initialize thread 2 */
-     sensor_temp.threads[TOTAL_THREADS-2] = rt_thread_create("store_temp",  //Name
+     sensor_temp.base.threads[TOTAL_THREADS-2] = rt_thread_create("store_temp",  //Name
                                                next_periodic_thread,        //Thread
                                                &sensor_temp,                //Object
                                                STORE_TEMP_STACK_SIZE,       //Stack size
@@ -87,7 +87,7 @@ sensor_temp_t sensor_temp_init(void)
                                                1
                                                );
 
-     if(!sensor_temp.threads[TOTAL_THREADS-2])
+     if(!sensor_temp.base.threads[TOTAL_THREADS-2])
          return RT_NULL;
 
 
@@ -99,7 +99,7 @@ void sensor_temp_start(void *param)
 {
     struct sensor_temp *sensor_temp = param;
 
-    rt_thread_startup(sensor_temp->threads[TOTAL_THREADS-1]);
-    rt_thread_startup(sensor_temp->threads[TOTAL_THREADS-2]);
+    rt_thread_startup(sensor_temp->base.threads[TOTAL_THREADS-1]);
+    rt_thread_startup(sensor_temp->base.threads[TOTAL_THREADS-2]);
 }
 

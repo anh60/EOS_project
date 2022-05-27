@@ -3,15 +3,19 @@
 
 #include <rtdef.h>
 #include "cpuusage.h"
+#include "base.h"
+
+
 
 //CPU_USAGE
 #define PRINT_CPU_USAGE_STACK_SIZE      1024
 #define PRINT_CPU_USAGE_PRIORITY        1
 #define PRINT_CPU_USAGE_ACTION_PERIOD   100  /* 1 seconds = 1000 ticks */
 
-struct cpu {
-    rt_thread_t print_cpu_usage;
 
+
+struct cpu {
+    base_struct base;
     rt_uint8_t major;
     rt_uint8_t minor;
 };
