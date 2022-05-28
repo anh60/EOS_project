@@ -23,47 +23,41 @@
 #define EVENT_FLAG3             (1 << 3)
 
 
-static rt_thread_t pressure_thread = RT_NULL;
-static struct rt_event event;
 
-/* Thread Sample */
-int pressure_init(void){
+struct sensor_pressure sensor_pressure;
 
-    // EVENT INIT
-    rt_err_t err = rt_event_init(&event, "event", RT_IPC_FLAG_FIFO);
+/* Initialize pressure sensor */
+sensor_pressure_t sensor_pressure_init(void)
+{
 
-    static rt_timer_t pressure_timer;
+    /* Initialize sensor variables */
+    sensor_pressure.pressure = 0;
+    sensor_pressure.flag     = 0;
+    /* Initialize base variables */
+    sensor_pressure.base.active_threads                     = 0;
+    sensor_pressure.base.function_pointers[TOTAL_THREADS-1] = pressure_handler;
+    sensor_pressure.base.action_period[TOTAL_THREADS-1]     = TIMEOUT;
 
-    // TIMER INIT
-    pressure_timer = rt_timer_create("pressure_timer",
-                                     start_thread,
-                                     RT_NULL,
-                                     TIMEOUT,
-                                     RT_TIMER_FLAG_PERIODIC);
 
-    // THREAD INIT
-    pressure_thread = rt_thread_create("pressure_thread",
-                                        pressure_handler,
-                                        pressure_thread,
-                                        THREAD_STACK_SIZE,
-                                        THREAD_PRIORITY,
-                                        THREAD_TIMESLICE
-                                        );
 
-    
-    // ERROR CHECKS
-    if (err != RT_EOK){ return -1; }
+    /* Initialize thread 1 */
 
-    if ( pressure_thread == RT_NULL) { return -2; }
-    rt_thread_startup(pressure_thread);
+    sensor_pressure.base.threads[TOTAL_THREADS-1] = rt_thread_create("pressure_thread",
+                                                  next_periodic_thread,
+                                                  &sensor_pressure,
+                                                  THREAD_STACK_SIZE,
+                                                  THREAD_PRIORITY,
+                                                  THREAD_TIMESLICE
+                                                  );
 
-    err = rt_timer_start(pressure_timer);
-    if (err != RT_NULL) {return -3;}
+    if(!sensor_pressure.base.threads[TOTAL_THREADS-1])
+        return RT_NULL;
 
-    return 0;
+    return &sensor_pressure;
 }
 
-static int pressure_get(void) {
+static int pressure_get(void)
+{
     // Read and return pressure from device
     // Mock function
     uint32_t r = rand() % 1024;
@@ -72,7 +66,8 @@ static int pressure_get(void) {
 }
 
 // TODO how many bits do we need to store possible data values?
-static void pressure_store(u_int32_t pressure) {
+static void pressure_store(uint32_t pressure)
+{
     
     static int flash_addr = ADDR_FLASH_SECTOR_4;
     
@@ -84,38 +79,27 @@ static void pressure_store(u_int32_t pressure) {
     // Lock flash memory
     HAL_FLASH_Lock();
 
-    // 
+
     flash_addr += 16;
 
     return;
 }
 
-static void pressure_handler(void *param) {
-    rt_uint32_t e;
+static void pressure_handler(void *param)
+{
+    struct sensor_pressure *sensor_pressure = param;
 
-    while(1){
+   sensor_pressure->pressure = pressure_get();
+   pressure_store(sensor_pressure->pressure);
 
-        rt_kprintf("In pressure handler \n");
-
-        int pressure = pressure_get();
-        pressure_store(pressure);
-        rt_kprintf("Pressure %d \n", pressure);
-
-
-        if (rt_event_recv(&event,
-                          EVENT_FLAG3,
-                          RT_EVENT_FLAG_OR | RT_EVENT_FLAG_CLEAR,
-                          RT_WAITING_FOREVER, &e) == RT_EOK)
-        { rt_kprintf("Event received pressure thread. \n", e); }
-
-    }
-
-    return;
+   return;
 }
 
-static void start_thread(void *param){
+void sensor_pressure_start(void *param)
+{
+    struct sensor_pressure *sensor_pressure = param;
 
-    rt_event_send(&event, EVENT_FLAG3);
+    rt_thread_startup(sensor_pressure->base.threads[TOTAL_THREADS-1]);
 
     return;
 }

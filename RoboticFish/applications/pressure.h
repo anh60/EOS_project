@@ -14,7 +14,31 @@
 #ifndef APPLICATIONS_PRESSURE_H_
 #define APPLICATIONS_PRESSURE_H_
 
+#include "base.h"
+
 #define RT_TIMER_FLAG_PERIODIC      0x2     /* Periodic timing     */
+
+
+struct sensor_pressure {
+    base_struct base;
+    uint32_t pressure;
+    uint8_t flag;
+    /* FLAGS:
+     * BITS |DESCRIPTION
+     * 1    |Triggered when pressure is dangerously high
+     * 2    |Undefined
+     * 3    |Undefined
+     * 4    |Undefined
+     * 5    |Undefined
+     * 6    |Undefined
+     * 7    |Undefined
+     * 8    |Undefined
+     */
+
+};
+typedef struct sensor_pressure *sensor_pressure_t;
+
+
 
 /**
  * @brief initialization and startup function for the pressure module.
@@ -26,7 +50,7 @@
  *         -2 - thread startup error 
  *         -3 - timer startup error
  */
-int pressure_init(void);
+sensor_pressure_t sensor_pressure_init(void);
 
 /**
  * @brief Mock function to simulate pressure sersor input data. 
@@ -43,7 +67,7 @@ static int pressure_get(void);
  * 
  * @param pressure 32 bit integer
  */
-static void pressure_store(u_int32_t pressure);
+static void pressure_store(uint32_t pressure);
 
 /**
  * @brief Thread using functions pressure_get and pressure_store to
@@ -59,7 +83,7 @@ static void pressure_handler(void *param);
  * 
  * @param param pressure object. 
  */
-static void start_thread(void *param);
+void sensor_pressure_start(void *param);
 
 
 
