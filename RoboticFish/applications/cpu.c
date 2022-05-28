@@ -25,7 +25,7 @@ static void print_cpu_usage(void* param)
     //Test end
 
    cpu_usage_get(&cpu->major, &cpu->minor);
-   rt_kprintf("cpu usage = %d.%d%\n",cpu->major,cpu->minor);
+   //rt_kprintf("cpu usage = %d.%d%\n",cpu->major,cpu->minor);
    rt_thread_delay(PRINT_CPU_USAGE_ACTION_PERIOD);
 }
 
@@ -33,8 +33,8 @@ static void print_cpu_usage(void* param)
 cpu_t cpu_performance_init(void)
 {
   /* Initialize cpu variables */
-    cpu.major           = 0;
-    cpu.minor           = 0;
+    cpu.major = 0;
+    cpu.minor = 0;
   /* Initialize base variables */
     cpu.base.active_threads  = 0;
     cpu.base.function_pointers[TOTAL_THREADS-1] = print_cpu_usage;
@@ -60,6 +60,6 @@ cpu_t cpu_performance_init(void)
 void cpu_usage_start(void *param)
 {
     struct cpu *cpu = param;
-
+    cpu_usage_init();
     rt_thread_startup(cpu->base.threads[TOTAL_THREADS-1]);
 }

@@ -24,10 +24,10 @@ void read_temp(void *param)
         if (sensor_temp->temperature > 200) sensor_temp->flag = 1;
 
 
-    rt_kprintf("Running read_temp at ticks %d and reading variable %d \n",
+    /*rt_kprintf("Running read_temp at ticks %d and reading variable %d \n",
                 rt_tick_get(),
                 sensor_temp->temperature
-                );
+                ); */
     rt_exit_critical();
 }
 
@@ -40,10 +40,10 @@ void store_temp(void *param)
 
     //TODO: STORE TEMP IN MEMORY
     rt_enter_critical();
-        rt_kprintf("Running store_temp at ticks %d and storing variable %d \n",
+    /*rt_kprintf("Running store_temp at ticks %d and storing variable %d \n",
                     rt_tick_get(),
                     sensor_temp->temperature
-                    );
+                    ); */
 
     rt_exit_critical();
 }

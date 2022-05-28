@@ -44,6 +44,7 @@ int main(void)
     int count = 1;
     while (count++)
     {
+        rt_kprintf("CPU USAGE: %d.%d% \n", cpu_usage_1->major, cpu_usage_1->minor);
         rt_kprintf("ADC TEMP: %d \n", sensor_temp_1->temperature);
         if(sensor_temp_1->flag == 1) rt_kprintf("Temperature is too hot! \n");
         rt_thread_mdelay(1000);
