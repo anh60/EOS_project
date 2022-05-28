@@ -7,6 +7,13 @@
 //Change if necessary
 #define TOTAL_THREADS 5
 
+/* IMPORTANT INFORMATION
+ *
+ * PERIODIC THREADS START FROM TOTAL_THREADS-1, -2, -N
+ * ONE SHOT THREADS START FROM 0, 1, 2, N
+ *
+ * next_periodic_thread WILL NOT WORK IF CONVENTION IS BROKEN
+ */
 typedef struct {
     uint8_t active_threads;
     rt_thread_t threads[TOTAL_THREADS];

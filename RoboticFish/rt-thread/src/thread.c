@@ -917,4 +917,4 @@ void next_periodic_thread(void* param)
         rt_thread_sleep(base->action_period[current_thread]);  //Sleep time
     }
 }
-RTM_EXPORT(rt_thread_startup_periodic);
+RTM_EXPORT(next_periodic_thread);
