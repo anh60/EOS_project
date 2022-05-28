@@ -8,24 +8,16 @@
 struct cpu cpu;
 
 /* Thread 1 */
-static void print_cpu_usage(void* param)
+static void cpu_usage(void* param)
 {
     struct cpu *cpu = param;
 
     //FILE *file = fopen("benchmarks.txt", "a");
-
-    //Test
-    //cpu->major = 3;
-    //cpu->minor = 1;
-    //rt_kprintf("cpu usage = %d.%d\n", cpu->major, cpu->minor);
-
     //fprintf(file, "%d.%d\n", cpu->major, cpu->minor);
     //fclose(file);
 
-    //Test end
 
    cpu_usage_get(&cpu->major, &cpu->minor);
-   //rt_kprintf("cpu usage = %d.%d%\n",cpu->major,cpu->minor);
    rt_thread_delay(PRINT_CPU_USAGE_ACTION_PERIOD);
 }
 
@@ -37,12 +29,12 @@ cpu_t cpu_performance_init(void)
     cpu.minor = 0;
   /* Initialize base variables */
     cpu.base.active_threads  = 0;
-    cpu.base.function_pointers[TOTAL_THREADS-1] = print_cpu_usage;
+    cpu.base.function_pointers[TOTAL_THREADS-1] = cpu_usage;
     cpu.base.action_period[TOTAL_THREADS-1]     = PRINT_CPU_USAGE_ACTION_PERIOD;
 
 
   /* Initialize thread 1 */
-    cpu.base.threads[TOTAL_THREADS-1] = rt_thread_create("print_cpu_usage",                //Name
+    cpu.base.threads[TOTAL_THREADS-1] = rt_thread_create("cpu_usage",           //Name
                                                   next_periodic_thread,         //Thread
                                                   &cpu,                         //Object
                                                   PRINT_CPU_USAGE_STACK_SIZE,   //Stack size
@@ -60,6 +52,7 @@ cpu_t cpu_performance_init(void)
 void cpu_usage_start(void *param)
 {
     struct cpu *cpu = param;
+
     cpu_usage_init();
     rt_thread_startup(cpu->base.threads[TOTAL_THREADS-1]);
 }
