@@ -23,6 +23,8 @@
 
 struct servo_motor servo;
 
+
+
 servo_motor_t servo_init (void)
 {
 
@@ -69,6 +71,14 @@ servo_motor_t servo_init (void)
     return &servo;
 }
 
+/**
+ * @brief Function to set positions of the servo motors given the input
+ *        from the calculation thread. If the calculation thread has not
+ *        yet provided a new result the old result should be applied again.
+ *
+ * @param param servo object.
+ */
+
 static void servo_set_positions(void *param)
 {
 
@@ -79,6 +89,14 @@ static void servo_set_positions(void *param)
 
 }
 
+/**
+ * @brief Function calculating the voltage level that should be applied to
+ *        the servo motors given a predefined measurement in dregrees. The function
+ *        changes the value of the servo_value array of the servo object passed
+ *        as parameter.
+ *
+ * @param param servo object.
+ */
 static void servo_calculate_positions(void *param)
 {
     struct servo_motor *servo = param;
@@ -112,6 +130,15 @@ static void servo_calculate_positions(void *param)
 }
 
 
+/**
+ * @brief Function to convert predefined degree measurements to PWM signals that can be applied to
+ *        a servomotor. Resolution is set to
+ *
+ * @param int value in degrees to be converted to PWM duty cycles
+ * @param int resolution measured in
+ *
+ * @return int PWM duty cycle
+ */
 static int degToPWM(int valDeg)
 {
     //0 = 500 us
@@ -122,6 +149,7 @@ static int degToPWM(int valDeg)
 
     return pwm;
 }
+
 
 void servo_start(void *param)
 {
