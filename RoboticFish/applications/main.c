@@ -10,19 +10,28 @@
  * PRINT WORKS WITH DEBUG LAUNCH (ctrl + f5)
  */
 
+#include "servo.h"
 #include "temp.h"
 #include "pressure.h"
 #include "cpu.h"
 
 //Objects
+servo_motor_t       servo_motors;
 sensor_temp_t       sensor_temp_1;
 sensor_pressure_t   sensor_pressure_1;
 cpu_t               cpu_usage_1;
 
 
 /* Initialize objects */
-int init_threads()
+int init_threads(void)
 {
+    //servo
+    servo_motors = servo_init();
+    if(!servo_motors) {
+        rt_kprintf("Failed to initialize servo motors");
+        return RT_ERROR;
+    }
+
     //temperature sensor
     sensor_temp_1 = sensor_temp_init();
     if(!sensor_temp_1) {
@@ -47,9 +56,10 @@ int init_threads()
     return 0;
 }
 
-void start_threads()
+void start_threads(void)
 {
     //Start threads in objects
+    servo_start(servo_motors);
     cpu_usage_start(cpu_usage_1);
     sensor_temp_start(sensor_temp_1);
     sensor_pressure_start(sensor_pressure_1);
@@ -66,8 +76,11 @@ int main(void)
     {
         rt_kprintf("CPU USAGE: %d.%d%;      ", cpu_usage_1->major, cpu_usage_1->minor);
         rt_kprintf("ADC TEMP: %d;    ", sensor_temp_1->temperature);
+        rt_kprintf("SERVO POS: %d ; %d ; %d ;    ", servo_motors->servo_value_pwm[0], servo_motors->servo_value_pwm[1], servo_motors->servo_value_pwm[2]);
         rt_kprintf("PRESSURE: %d; \n", sensor_pressure_1->pressure);
+
         if(sensor_temp_1->flag == 1) rt_kprintf("Temperature is too hot! \n");
+
         rt_thread_mdelay(100);
     }
 

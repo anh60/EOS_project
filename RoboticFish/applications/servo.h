@@ -12,28 +12,25 @@
  * 
  */
 #include <rtdef.h>
+#include "base.h"
 
 #ifndef APPLICATIONS_SERVO_H_
 #define APPLICATIONS_SERVO_H_
 
-#define RT_TIMER_FLAG_PERIODIC      0x2     /* Periodic timing */
-#define RT_TIMER_FLAG_ONE_SHOT      0x0     /* One shot timing */
-
-// 1000 ticks is one second
-
+#define STEPS_PER_REVOLUTION 10
+#define TOTAL_SERVO_MOTORS 3
 /**
  * @brief object describing a servo motor object as the parameters needs to be passed between the two threads.
  * 
  */
 struct servo_motor {
-    rt_thread_t servo_thread_calculate;
-    rt_thread_t servo_thread_set;
+    base_struct base;
 
-    int servo_value[3];
-    int servo_value_array[10];
+    int servo_value_degrees[TOTAL_SERVO_MOTORS][STEPS_PER_REVOLUTION];
+    int servo_value_pwm[TOTAL_SERVO_MOTORS];
 };
 
-typedef struct servo_motor *servo_motor_p;
+typedef struct servo_motor *servo_motor_t;
 
 /**
  * @brief Initializes all necessary threads, timers and events to run the task as well as starting 
@@ -45,7 +42,7 @@ typedef struct servo_motor *servo_motor_p;
  *         -2 - error in thread creation
  *         -3 - error in thread startup 
  */
-int servo_init(void);
+servo_motor_t servo_init(void);
 
 /**
  * @brief Function to set positions of the servo motors given the input
