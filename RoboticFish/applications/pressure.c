@@ -26,7 +26,17 @@
 
 struct sensor_pressure sensor_pressure;
 
-/* Initialize pressure sensor */
+
+/**
+ * @brief initialization and startup function for the pressure module.
+ *        Activates the timer, event and thread needed. Does some light error detection.
+ *
+ * @return int
+ *          0 - no errors
+ *         -1 - event init error
+ *         -2 - thread startup error
+ *         -3 - timer startup error
+ */
 sensor_pressure_t sensor_pressure_init(void)
 {
 
@@ -56,6 +66,12 @@ sensor_pressure_t sensor_pressure_init(void)
     return &sensor_pressure;
 }
 
+/**
+ * @brief Mock function to simulate pressure sersor input data.
+ *
+ * @return int - random integer in the range 0-1024.
+ */
+
 static int pressure_get(void)
 {
     // Read and return pressure from device
@@ -66,6 +82,14 @@ static int pressure_get(void)
 }
 
 // TODO how many bits do we need to store possible data values?
+/**
+ * @brief Function storing pressure data to sector 4 of the microcontroller
+ *        flash memory. Remark: if the value is to be read out again the
+ *        bits need to be rearranged in the correct edian as usual when working
+ *        with flash memory.
+ *
+ * @param pressure 32 bit integer
+ */
 static void pressure_store(uint32_t pressure)
 {
     
@@ -85,6 +109,13 @@ static void pressure_store(uint32_t pressure)
     return;
 }
 
+/**
+ * @brief Thread using functions pressure_get and pressure_store to
+ *        read and store pressure sensor data. Triggered periodically in
+ *        periods of 75 ms.
+ *
+ * @param param
+ */
 static void pressure_handler(void *param)
 {
     struct sensor_pressure *sensor_pressure = param;
@@ -95,6 +126,11 @@ static void pressure_handler(void *param)
    return;
 }
 
+/**
+ * @brief Function triggered by the correlating timer to send an event to the suspended thread.
+ *
+ * @param param pressure object.
+ */
 void sensor_pressure_start(void *param)
 {
     struct sensor_pressure *sensor_pressure = param;
