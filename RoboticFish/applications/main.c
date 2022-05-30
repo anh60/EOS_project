@@ -75,7 +75,7 @@ int main(void)
         rt_kprintf("TIME: %d ms;    ", rt_tick_get());
         rt_kprintf("CPU USAGE: %d.%d%;      ", cpu_usage_1->major, cpu_usage_1->minor);
         rt_kprintf("ADC TEMP: %d;    ", sensor_temp_1->temperature);
-        rt_kprintf("SERVO POS: %d ; %d ; %d ;    ", servo_motors->servo_value_pwm[0], servo_motors->servo_value_pwm[1], servo_motors->servo_value_pwm[2]);
+        rt_kprintf("SERVO POS: %d ; %d ; %d;    ", servo_motors->servo_value_pwm[0], servo_motors->servo_value_pwm[1], servo_motors->servo_value_pwm[2]);
         rt_kprintf("PRESSURE: %d;   ", sensor_pressure_1->pressure);
 
         if(sensor_temp_1->flag == 1) rt_kprintf("Temperature is too hot!");
