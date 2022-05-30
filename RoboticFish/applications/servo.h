@@ -32,18 +32,7 @@ struct servo_motor {
 
 typedef struct servo_motor *servo_motor_t;
 
-/**
- * @brief Initializes all necessary threads, timers and events to run the task as well as starting 
- *        the timer and threads. Also has a simple error handling.
- * 
- * @return int 
- *         0  - no errors
- *         -1 - error in timer startups
- *         -2 - error in thread creation
- *         -3 - error in thread startup 
- */
 servo_motor_t servo_init(void);
-
 void servo_start(void *param);
 
 #endif /* APPLICATIONS_SERVO_H_ */

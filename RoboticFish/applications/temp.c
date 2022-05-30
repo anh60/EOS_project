@@ -7,8 +7,14 @@
 struct sensor_temp sensor_temp;
 
 
-/* Thread 1 */
-void read_temp(void *param)
+/**
+ * @brief Thread generating mock data to simulate readings from a temperature sensor.
+ *        Changes the value of the temp value in the sensor_temp object passed into the function.
+ *        Temperature values is in the range 0-256.
+ *
+ * @param param temp_sensor object
+ */
+static void read_temp(void *param)
 {
     /*Read temperature*/
     struct sensor_temp *sensor_temp = param;
@@ -22,21 +28,19 @@ void read_temp(void *param)
 
         // Temperature critically high, trigger sensor flag
         if (sensor_temp->temperature > 200) sensor_temp->flag = 1;
-
-
-    /*rt_kprintf("Running read_temp at ticks %d and reading variable %d \n",
-                rt_tick_get(),
-                sensor_temp->temperature
-                ); */
     rt_exit_critical();
 }
 
 
-/* Thread 2 */
-void store_temp(void *param)
+/**
+ * @brief Stores temperature registered by the sensor to flash memory section 4 of the mcu.
+ *
+ * @param param temp_sensor object
+ */
+static void store_temp(void *param)
 {
     /*Store temperature using store_temp*/
-    struct sensor_temp *sensor_temp = param;
+    //struct sensor_temp *sensor_temp = param;
 
     //TODO: STORE TEMP IN MEMORY
     rt_enter_critical();
@@ -49,7 +53,12 @@ void store_temp(void *param)
 }
 
 
-/* Initialize temperature sensor */
+
+/**
+ * @brief Initializes and starts up timers and threads needed.
+ *
+ * @return sensor_temp_t
+ */
 sensor_temp_t sensor_temp_init(void)
 {
    /* Initialize sensor variables */

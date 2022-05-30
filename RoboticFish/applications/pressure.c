@@ -27,51 +27,12 @@
 struct sensor_pressure sensor_pressure;
 
 
-/**
- * @brief initialization and startup function for the pressure module.
- *        Activates the timer, event and thread needed. Does some light error detection.
- *
- * @return int
- *          0 - no errors
- *         -1 - event init error
- *         -2 - thread startup error
- *         -3 - timer startup error
- */
-sensor_pressure_t sensor_pressure_init(void)
-{
-
-    /* Initialize sensor variables */
-    sensor_pressure.pressure = 0;
-    sensor_pressure.flag     = 0;
-    /* Initialize base variables */
-    sensor_pressure.base.active_threads                     = 0;
-    sensor_pressure.base.function_pointers[TOTAL_THREADS-1] = pressure_handler;
-    sensor_pressure.base.action_period[TOTAL_THREADS-1]     = TIMEOUT;
-
-
-
-    /* Initialize thread 1 */
-
-    sensor_pressure.base.threads[TOTAL_THREADS-1] = rt_thread_create("pressure_thread",
-                                                  next_periodic_thread,
-                                                  &sensor_pressure,
-                                                  THREAD_STACK_SIZE,
-                                                  THREAD_PRIORITY,
-                                                  THREAD_TIMESLICE
-                                                  );
-
-    if(!sensor_pressure.base.threads[TOTAL_THREADS-1])
-        return RT_NULL;
-
-    return &sensor_pressure;
-}
 
 /**
  * @brief Mock function to simulate pressure sersor input data.
  *
  * @return int - random integer in the range 0-1024.
  */
-
 static int pressure_get(void)
 {
     // Read and return pressure from device
@@ -124,6 +85,46 @@ static void pressure_handler(void *param)
    pressure_store(sensor_pressure->pressure);
 
    return;
+}
+
+
+/**
+ * @brief initialization and startup function for the pressure module.
+ *        Activates the timer, event and thread needed. Does some light error detection.
+ *
+ * @return int
+ *          0 - no errors
+ *         -1 - event init error
+ *         -2 - thread startup error
+ *         -3 - timer startup error
+ */
+sensor_pressure_t sensor_pressure_init(void)
+{
+
+    /* Initialize sensor variables */
+    sensor_pressure.pressure = 0;
+    sensor_pressure.flag     = 0;
+    /* Initialize base variables */
+    sensor_pressure.base.active_threads                     = 0;
+    sensor_pressure.base.function_pointers[TOTAL_THREADS-1] = pressure_handler;
+    sensor_pressure.base.action_period[TOTAL_THREADS-1]     = TIMEOUT;
+
+
+
+    /* Initialize thread 1 */
+
+    sensor_pressure.base.threads[TOTAL_THREADS-1] = rt_thread_create("pressure_thread",
+                                                  next_periodic_thread,
+                                                  &sensor_pressure,
+                                                  THREAD_STACK_SIZE,
+                                                  THREAD_PRIORITY,
+                                                  THREAD_TIMESLICE
+                                                  );
+
+    if(!sensor_pressure.base.threads[TOTAL_THREADS-1])
+        return RT_NULL;
+
+    return &sensor_pressure;
 }
 
 /**

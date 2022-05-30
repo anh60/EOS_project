@@ -51,29 +51,7 @@ struct sensor_temp {
 typedef struct sensor_temp *sensor_temp_t;
 
 
-//THREADS
-/**
- * @brief Thread generating mock data to simulate readings from a temperature sensor. 
- *        Changes the value of the temp value in the sensor_temp object passed into the function. 
- *        Temperature values is in the range 0-256.
- * 
- * @param param temp_sensor object
- */
-void read_temp(void *param);
 
-/**
- * @brief Stores temperature registered by the sensor to flash memory section 4 of the mcu. 
- * 
- * @param param temp_sensor object
- */
-void store_temp(void *param);
-
-//FUNCTIONS
-/**
- * @brief Initializes and starts up timers and threads needed.  
- * 
- * @return sensor_temp_t 
- */
 sensor_temp_t sensor_temp_init(void);
 void sensor_temp_start(void *param);
 

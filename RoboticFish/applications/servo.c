@@ -23,8 +23,87 @@
 
 struct servo_motor servo;
 
+/**
+ * @brief Function to convert predefined degree measurements to PWM signals that can be applied to
+ *        a servomotor. Resolution is set to
+ *
+ * @param int value in degrees to be converted to PWM duty cycles
+ * @param int resolution measured in
+ *
+ * @return int PWM duty cycle
+ */
+static int degToPWM(int valDeg)
+{
+    //0 = 500 us
+    //180 = 2500 us
+    // theoretical precision to 0.09
+
+    int pwm = (valDeg / 0.09) + 500;
+
+    return pwm;
+}
 
 
+static void servo_set_positions(void *param)
+{
+
+    // TODO find error handling if no new input has been given 
+
+   //set set voltage signals based on servo_value array
+
+
+}
+
+/**
+ * @brief Function calculating the voltage level that should be applied to
+ *        the servo motors given a predefined measurement in dregrees. The function
+ *        changes the value of the servo_value array of the servo object passed
+ *        as parameter.
+ *
+ * @param param servo object.
+ */
+static void servo_calculate_positions(void *param)
+{
+    struct servo_motor *servo = param;
+    static int index = 0;
+    // This is the first delay to synchronize the execution of the two threads
+    //rt_thread_delay(40 * TICKS_MS);
+
+    // A possibility is to open a file and read from it or can it just be retrived from prog.mem
+    // need to produce a PWM signal from degrees to ms
+
+    //Create random values for next revolution (does not make sense, for demonstration only)
+    if(index == 0)
+    {
+        for(int this_servo = 0; this_servo < TOTAL_SERVO_MOTORS; this_servo++)
+        {
+            for(int this_step = 0; this_step < STEPS_PER_REVOLUTION; this_step++)
+            {   //Dummy data in degrees
+                servo->servo_value_degrees[this_servo][this_step] = rand() % 180;
+            }
+        }
+    }
+
+    //set pwm value for all motors
+    for(int this_servo = 0; this_servo < TOTAL_SERVO_MOTORS; this_servo++)
+    {
+        servo->servo_value_pwm[this_servo] = degToPWM(servo->servo_value_degrees[this_servo][index]);
+    }
+
+    index = (index + 1) % STEPS_PER_REVOLUTION;
+
+}
+
+/**
+ * @brief Initializes all necessary threads, timers and events to run the task as well as starting
+ *        the timer and threads. Also has a simple error handling.
+ *
+ * @return int
+ *         0  - no errors
+ *         -1 - error in timer startups
+ *         -2 - error in thread creation
+ *         -3 - error in thread startup
+ */
 servo_motor_t servo_init (void)
 {
 
@@ -78,78 +157,6 @@ servo_motor_t servo_init (void)
  *
  * @param param servo object.
  */
-
-static void servo_set_positions(void *param)
-{
-
-    // TODO find error handling if no new input has been given 
-
-   //set set voltage signals based on servo_value array
-
-
-}
-
-/**
- * @brief Function calculating the voltage level that should be applied to
- *        the servo motors given a predefined measurement in dregrees. The function
- *        changes the value of the servo_value array of the servo object passed
- *        as parameter.
- *
- * @param param servo object.
- */
-static void servo_calculate_positions(void *param)
-{
-    struct servo_motor *servo = param;
-    static int index = 0;
-    // This is the first delay to synchronize the execution of the two threads
-    //rt_thread_delay(40 * TICKS_MS);
-
-    // A possibility is to open a file and read from it or can it just be retrived from prog.mem
-    // need to produce a PWM signal from degrees to ms
-
-    //Create random values for next revolution (does not make sense, for demonstration only)
-    if(index == 0)
-    {
-        for(int this_servo = 0; this_servo < TOTAL_SERVO_MOTORS; this_servo++)
-        {
-            for(int this_step = 0; this_step < STEPS_PER_REVOLUTION; this_step++)
-            {   //Dummy data in degrees
-                servo->servo_value_degrees[this_servo][this_step] = rand() % 180;
-            }
-        }
-    }
-
-    //set pwm value for all motors
-    for(int this_servo = 0; this_servo < TOTAL_SERVO_MOTORS; this_servo++)
-    {
-        servo->servo_value_pwm[this_servo] = degToPWM(servo->servo_value_degrees[this_servo][index]);
-    }
-
-    index = (index + 1) % STEPS_PER_REVOLUTION;
-
-}
-
-
-/**
- * @brief Function to convert predefined degree measurements to PWM signals that can be applied to
- *        a servomotor. Resolution is set to
- *
- * @param int value in degrees to be converted to PWM duty cycles
- * @param int resolution measured in
- *
- * @return int PWM duty cycle
- */
-static int degToPWM(int valDeg)
-{
-    //0 = 500 us
-    //180 = 2500 us
-    // theoretical precision to 0.09
-
-    int pwm = (valDeg / 0.09) + 500;
-
-    return pwm;
-}
-
 
 void servo_start(void *param)
 {
