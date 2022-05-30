@@ -13,14 +13,6 @@
 #include <stdlib.h>
 #include "drv_common.h"
 
-#define THREAD_PRIORITY         3
-#define THREAD_STACK_SIZE       512
-#define THREAD_TIMESLICE        1
-
-#define TICKS_MS                10
-#define TIMEOUT_SET             (10 * TICKS_MS)
-#define TIMEOUT_CALCULATE       (40 * TICKS_MS)
-
 struct servo_motor servo;
 
 /**
@@ -49,7 +41,7 @@ static void servo_set_positions(void *param)
 
     // TODO find error handling if no new input has been given 
 
-   //set set voltage signals based on servo_value array
+    //set set voltage signals based on servo_value array
 
 
 }
@@ -122,24 +114,24 @@ servo_motor_t servo_init (void)
     servo.base.active_threads                     = 0;
     servo.base.function_pointers[TOTAL_THREADS-1] = servo_calculate_positions;
     servo.base.function_pointers[TOTAL_THREADS-2] = servo_set_positions;
-    servo.base.action_period[TOTAL_THREADS-1]     = TIMEOUT_CALCULATE;
-    servo.base.action_period[TOTAL_THREADS-2]     = TIMEOUT_SET;
+    servo.base.action_period[TOTAL_THREADS-1]     = CALCULATE_POS_ACTION_PERIOD;
+    servo.base.action_period[TOTAL_THREADS-2]     = SET_POS_ACTION_PERIOD;
 
 
     // THREAD HANDLING
     servo.base.threads[TOTAL_THREADS-1] = rt_thread_create("servo_thread_calculate",
                                         next_periodic_thread,
                                         &servo,
-                                        THREAD_STACK_SIZE,
-                                        THREAD_PRIORITY,
-                                        THREAD_TIMESLICE);
+                                        CALCULATE_POS_THREAD_STACK_SIZE,
+                                        CALCULATE_POS_THREAD_PRIORITY,
+                                        CALCULATE_POS_THREAD_TIMESLICE);
 
     servo.base.threads[TOTAL_THREADS-2]  = rt_thread_create("servo_thread_set",
                                          next_periodic_thread,
                                          &servo,
-                                         THREAD_STACK_SIZE,
-                                         THREAD_PRIORITY,
-                                         THREAD_TIMESLICE);
+                                         SET_POS_THREAD_STACK_SIZE,
+                                         SET_POS_THREAD_PRIORITY,
+                                         SET_POS_THREAD_TIMESLICE);
 
     if(!servo.base.threads[TOTAL_THREADS-1])
             return RT_NULL;

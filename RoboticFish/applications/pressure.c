@@ -13,17 +13,6 @@
 #include <stdlib.h>
 #include "flash.h"
 
-#define THREAD_PRIORITY         2
-#define THREAD_STACK_SIZE       512
-#define THREAD_TIMESLICE        1
-
-#define TICKS_MS                10
-#define TIMEOUT                 (75 * TICKS_MS)
-
-#define EVENT_FLAG3             (1 << 3)
-
-
-
 struct sensor_pressure sensor_pressure;
 
 
@@ -103,11 +92,10 @@ sensor_pressure_t sensor_pressure_init(void)
 
     /* Initialize sensor variables */
     sensor_pressure.pressure = 0;
-    sensor_pressure.flag     = 0;
     /* Initialize base variables */
     sensor_pressure.base.active_threads                     = 0;
     sensor_pressure.base.function_pointers[TOTAL_THREADS-1] = pressure_handler;
-    sensor_pressure.base.action_period[TOTAL_THREADS-1]     = TIMEOUT;
+    sensor_pressure.base.action_period[TOTAL_THREADS-1]     = PRESSURE_HANDLER_THREAD_ACTION_PERIOD;
 
 
 
@@ -116,9 +104,9 @@ sensor_pressure_t sensor_pressure_init(void)
     sensor_pressure.base.threads[TOTAL_THREADS-1] = rt_thread_create("pressure_thread",
                                                   next_periodic_thread,
                                                   &sensor_pressure,
-                                                  THREAD_STACK_SIZE,
-                                                  THREAD_PRIORITY,
-                                                  THREAD_TIMESLICE
+                                                  PRESSURE_HANDLER_THREAD_STACK_SIZE,
+                                                  PRESSURE_HANDLER_THREAD_PRIORITY,
+                                                  PRESSURE_HANDLER_THREAD_TIMESLICE
                                                   );
 
     if(!sensor_pressure.base.threads[TOTAL_THREADS-1])

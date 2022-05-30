@@ -70,18 +70,19 @@ int main(void)
     init_threads();
     start_threads();
 
-
-    int count = 1;
-    while (count++)
+    while(1)
     {
+        rt_kprintf("TIME: %d ms;    ", rt_tick_get());
         rt_kprintf("CPU USAGE: %d.%d%;      ", cpu_usage_1->major, cpu_usage_1->minor);
         rt_kprintf("ADC TEMP: %d;    ", sensor_temp_1->temperature);
         rt_kprintf("SERVO POS: %d ; %d ; %d ;    ", servo_motors->servo_value_pwm[0], servo_motors->servo_value_pwm[1], servo_motors->servo_value_pwm[2]);
-        rt_kprintf("PRESSURE: %d; \n", sensor_pressure_1->pressure);
+        rt_kprintf("PRESSURE: %d;   ", sensor_pressure_1->pressure);
 
-        if(sensor_temp_1->flag == 1) rt_kprintf("Temperature is too hot! \n");
+        if(sensor_temp_1->flag == 1) rt_kprintf("Temperature is too hot!");
 
-        rt_thread_mdelay(100);
+        rt_kprintf("\n");
+
+        rt_thread_mdelay(20);
     }
 
     return RT_EOK;

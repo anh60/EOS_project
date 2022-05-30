@@ -18,7 +18,6 @@ static void cpu_usage(void* param)
 
 
    cpu_usage_get(&cpu->major, &cpu->minor);
-   rt_thread_delay(PRINT_CPU_USAGE_ACTION_PERIOD);
 }
 
 /* Initialize CPU usage */
@@ -30,16 +29,16 @@ cpu_t cpu_performance_init(void)
   /* Initialize base variables */
     cpu.base.active_threads  = 0;
     cpu.base.function_pointers[TOTAL_THREADS-1] = cpu_usage;
-    cpu.base.action_period[TOTAL_THREADS-1]     = PRINT_CPU_USAGE_ACTION_PERIOD;
+    cpu.base.action_period[TOTAL_THREADS-1]     = CPU_USAGE_THREAD_ACTION_PERIOD;
 
 
   /* Initialize thread 1 */
     cpu.base.threads[TOTAL_THREADS-1] = rt_thread_create("cpu_usage",           //Name
                                                   next_periodic_thread,         //Thread
                                                   &cpu,                         //Object
-                                                  PRINT_CPU_USAGE_STACK_SIZE,   //Stack size
-                                                  PRINT_CPU_USAGE_PRIORITY,     //Priority
-                                                  1
+                                                  CPU_USAGE_THREAD_STACK_SIZE,   //Stack size
+                                                  CPU_USAGE_THREAD_PRIORITY,     //Priority
+                                                  CPU_USAGE_THREAD_TIMESLICE
                                                   );
 
     if(!cpu.base.threads[TOTAL_THREADS-1])

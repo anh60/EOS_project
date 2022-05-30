@@ -68,18 +68,18 @@ sensor_temp_t sensor_temp_init(void)
     sensor_temp.base.active_threads       = 0;
     sensor_temp.base.function_pointers[TOTAL_THREADS-1] = read_temp;
     sensor_temp.base.function_pointers[TOTAL_THREADS-2] = store_temp;
-    sensor_temp.base.action_period[TOTAL_THREADS-1]     = READ_TEMP_ACTION_PERIOD;
-    sensor_temp.base.action_period[TOTAL_THREADS-2]     = STORE_TEMP_ACTION_PERIOD;
+    sensor_temp.base.action_period[TOTAL_THREADS-1]     = READ_TEMP_THREAD_ACTION_PERIOD;
+    sensor_temp.base.action_period[TOTAL_THREADS-2]     = STORE_TEMP_THREAD_ACTION_PERIOD;
 
 
 
    /* Initialize thread 1 */
     sensor_temp.base.threads[TOTAL_THREADS-1] = rt_thread_create("read_temp",    //Name
-                                              next_periodic_thread,         //Thread
-                                              &sensor_temp,                 //Object
-                                              READ_TEMP_STACK_SIZE,         //Stack size
-                                              READ_TEMP_PRIORITY,           //Priority
-                                              1
+                                              next_periodic_thread,              //Thread
+                                              &sensor_temp,                      //Object
+                                              READ_TEMP_THREAD_STACK_SIZE,
+                                              READ_TEMP_THREAD_PRIORITY,
+                                              READ_TEMP_THREAD_TIMESLICE
                                               );
 
     if(!sensor_temp.base.threads[TOTAL_THREADS-1])
@@ -89,11 +89,11 @@ sensor_temp_t sensor_temp_init(void)
 
     /* Initialize thread 2 */
      sensor_temp.base.threads[TOTAL_THREADS-2] = rt_thread_create("store_temp",  //Name
-                                               next_periodic_thread,        //Thread
-                                               &sensor_temp,                //Object
-                                               STORE_TEMP_STACK_SIZE,       //Stack size
-                                               STORE_TEMP_PRIORITY,         //Priority
-                                               1
+                                               next_periodic_thread,             //Thread
+                                               &sensor_temp,                     //Object
+                                               STORE_TEMP_THREAD_STACK_SIZE,
+                                               STORE_TEMP_THREAD_PRIORITY,
+                                               STORE_TEMP_THREAD_TIMESLICE
                                                );
 
      if(!sensor_temp.base.threads[TOTAL_THREADS-2])

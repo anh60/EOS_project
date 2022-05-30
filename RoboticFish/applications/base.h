@@ -4,13 +4,16 @@
 
 #include <rtdef.h>
 
+/* 1 seconds = 1000 ticks */
+#define TICKS_MS 1
+
 //Change if necessary
 #define TOTAL_THREADS 5
 
 /* IMPORTANT INFORMATION
  *
  * PERIODIC THREADS START FROM TOTAL_THREADS-1, -2, -N
- * ONE SHOT THREADS START FROM 0, 1, 2, N
+ * APERIODIC THREADS START FROM 0, 1, 2, N
  *
  * next_periodic_thread WILL NOT WORK IF CONVENTION IS BROKEN
  */

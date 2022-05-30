@@ -8,9 +8,10 @@
 
 
 //CPU_USAGE
-#define PRINT_CPU_USAGE_STACK_SIZE      1024
-#define PRINT_CPU_USAGE_PRIORITY        1
-#define PRINT_CPU_USAGE_ACTION_PERIOD   100  /* 1 seconds = 1000 ticks */
+#define CPU_USAGE_THREAD_STACK_SIZE      1024
+#define CPU_USAGE_THREAD_PRIORITY        1
+#define CPU_USAGE_THREAD_TIMESLICE       1
+#define CPU_USAGE_THREAD_ACTION_PERIOD   (20 * TICKS_MS)  /* 1 seconds = 1000 ticks */
 
 
 
@@ -21,10 +22,8 @@ struct cpu {
 };
 typedef struct cpu *cpu_t;
 
-//THREADS
-cpu_t cpu_performance_init(void);
 
-//FUNCTIONS
+cpu_t cpu_performance_init(void);
 void cpu_usage_start(void *param);
 
 #endif /* __CPU_H__ */
