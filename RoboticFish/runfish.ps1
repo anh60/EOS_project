@@ -7,11 +7,15 @@ if($q -eq '1'){
     C:/RT-ThreadStudio/repo/Extract/Debugger_Support_Packages/RealThread/QEMU/4.2.0.4\qemu-system-arm.exe -M stm32f401-st-nucleo -sd sd.bin -serial stdio -monitor null -nographic -kernel Debug/rtthread.bin
 } 
 elseif($q -eq '2'){
-    
-    C:/RT-ThreadStudio/repo/Extract/Debugger_Support_Packages/RealThread/QEMU/4.2.0.4\qemu-system-arm.exe -M stm32f401-st-nucleo -sd sd.bin -serial stdio -monitor null -nographic -kernel Debug/rtthread.bin | Out-File .\benchmarking\benchmarks.txt
+    try {
+        C:/RT-ThreadStudio/repo/Extract/Debugger_Support_Packages/RealThread/QEMU/4.2.0.4\qemu-system-arm.exe -M stm32f401-st-nucleo -sd sd.bin -serial stdio -monitor null -nographic -kernel Debug/rtthread.bin | Out-File .\benchmarking\benchmarks.txt
+    }
+    finally {
+        notepad benchmarking/benchmarks.txt
+    }
 }
 else{
-    Write-Output "Mjaa"
+    Write-Output "nope"
     Write-Output ""
     exit
 }
