@@ -22,8 +22,8 @@ static void read_temp(void *param)
     rt_enter_critical();
         sensor_temp->flag = 0;
         //Generate random ADC value from 0 to 2^NBIT
-        int range = 1 << ADC_NBITS;
-        int temp = rand() % range;
+        uint8_t range = 1 << ADC_NBITS;
+        uint8_t temp = rand() % range;
         sensor_temp->temperature = temp;
 
         // Temperature critically high, trigger sensor flag
