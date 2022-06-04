@@ -31,8 +31,8 @@ cpu_t cpu_performance_init(void)
     cpu.base.threads[TOTAL_THREADS-1] = rt_thread_create("cpu_usage",           //Name
                                                   next_periodic_thread,         //Thread
                                                   &cpu,                         //Object
-                                                  CPU_USAGE_THREAD_STACK_SIZE,   //Stack size
-                                                  CPU_USAGE_THREAD_PRIORITY,     //Priority
+                                                  CPU_USAGE_THREAD_STACK_SIZE,
+                                                  CPU_USAGE_THREAD_PRIORITY,
                                                   CPU_USAGE_THREAD_TIMESLICE
                                                   );
 

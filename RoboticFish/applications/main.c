@@ -70,9 +70,12 @@ int main(void)
     init_threads();
     start_threads();
 
-    while(1)
+    int current_time = 0;
+    const int target_time = 20000;
+    while(current_time < target_time)
     {
-        rt_kprintf("TIME: %d ms;    ", rt_tick_get());
+        current_time = rt_tick_get();
+        rt_kprintf("TIME: %d ms;    ", current_time);
         rt_kprintf("CPU USAGE: %d.%d%;      ", cpu_usage_1->major, cpu_usage_1->minor);
         rt_kprintf("ADC TEMP: %d;    ", sensor_temp_1->temperature);
         rt_kprintf("SERVO POS: %d ; %d ; %d;    ", servo_motors->servo_value_pwm[0], servo_motors->servo_value_pwm[1], servo_motors->servo_value_pwm[2]);

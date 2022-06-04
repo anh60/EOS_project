@@ -14,21 +14,12 @@ struct sensor_temp sensor_temp;
  *
  * @param param temp_sensor object
  */
-static void read_temp(void *param)
+static uint8_t read_temp()
 {
-    /*Read temperature*/
-    struct sensor_temp *sensor_temp = param;
-
-    rt_enter_critical();
-        sensor_temp->flag = 0;
-        //Generate random ADC value from 0 to 2^NBIT
-        uint8_t range = 1 << ADC_NBITS;
-        uint8_t temp = rand() % range;
-        sensor_temp->temperature = temp;
-
-        // Temperature critically high, trigger sensor flag
-        if (sensor_temp->temperature > 200) sensor_temp->flag = 1;
-    rt_exit_critical();
+    //Generate random ADC value from 0 to 2^NBIT
+    uint8_t range = 1 << ADC_NBITS;
+    uint8_t temp = rand() % range;
+    return temp;
 }
 
 
@@ -39,17 +30,27 @@ static void read_temp(void *param)
  */
 static void store_temp(void *param)
 {
-    /*Store temperature using store_temp*/
-    //struct sensor_temp *sensor_temp = param;
-
     //TODO: STORE TEMP IN MEMORY
+    /*Store temperature using store_temp*/
+    struct sensor_temp *sensor_temp = param;
+    sensor_temp->flag = 0;
+
     rt_enter_critical();
+    sensor_temp->temperature = read_temp();
+    rt_exit_critical();
+
+    // Temperature critically high, trigger sensor flag
+    if (sensor_temp->temperature > 200) sensor_temp->flag = 1;
+
+
+
     /*rt_kprintf("Running store_temp at ticks %d and storing variable %d \n",
                     rt_tick_get(),
                     sensor_temp->temperature
                     ); */
 
-    rt_exit_critical();
+
+
 }
 
 
@@ -66,29 +67,13 @@ sensor_temp_t sensor_temp_init(void)
     sensor_temp.flag                 = 0;
    /* Initialize base variables */
     sensor_temp.base.active_threads       = 0;
-    sensor_temp.base.function_pointers[TOTAL_THREADS-1] = read_temp;
-    sensor_temp.base.function_pointers[TOTAL_THREADS-2] = store_temp;
-    sensor_temp.base.action_period[TOTAL_THREADS-1]     = READ_TEMP_THREAD_ACTION_PERIOD;
-    sensor_temp.base.action_period[TOTAL_THREADS-2]     = STORE_TEMP_THREAD_ACTION_PERIOD;
+    sensor_temp.base.function_pointers[TOTAL_THREADS-1] = store_temp;
+    sensor_temp.base.action_period[TOTAL_THREADS-1]     = STORE_TEMP_THREAD_ACTION_PERIOD;
 
 
 
    /* Initialize thread 1 */
-    sensor_temp.base.threads[TOTAL_THREADS-1] = rt_thread_create("read_temp",    //Name
-                                              next_periodic_thread,              //Thread
-                                              &sensor_temp,                      //Object
-                                              READ_TEMP_THREAD_STACK_SIZE,
-                                              READ_TEMP_THREAD_PRIORITY,
-                                              READ_TEMP_THREAD_TIMESLICE
-                                              );
-
-    if(!sensor_temp.base.threads[TOTAL_THREADS-1])
-        return RT_NULL;
-
-
-
-    /* Initialize thread 2 */
-     sensor_temp.base.threads[TOTAL_THREADS-2] = rt_thread_create("store_temp",  //Name
+     sensor_temp.base.threads[TOTAL_THREADS-1] = rt_thread_create("store_temp",  //Name
                                                next_periodic_thread,             //Thread
                                                &sensor_temp,                     //Object
                                                STORE_TEMP_THREAD_STACK_SIZE,
@@ -96,7 +81,7 @@ sensor_temp_t sensor_temp_init(void)
                                                STORE_TEMP_THREAD_TIMESLICE
                                                );
 
-     if(!sensor_temp.base.threads[TOTAL_THREADS-2])
+     if(!sensor_temp.base.threads[TOTAL_THREADS-1])
          return RT_NULL;
 
 
@@ -109,6 +94,5 @@ void sensor_temp_start(void *param)
     struct sensor_temp *sensor_temp = param;
 
     rt_thread_startup(sensor_temp->base.threads[TOTAL_THREADS-1]);
-    rt_thread_startup(sensor_temp->base.threads[TOTAL_THREADS-2]);
 }
 
