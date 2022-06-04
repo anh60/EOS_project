@@ -910,11 +910,18 @@ void next_periodic_thread(void* param)
     uint8_t current_thread = TOTAL_THREADS - base->active_threads -1;
     base->active_threads = base->active_threads + 1;
 
+    //Start tick
+    const int offset = rt_tick_get();
     //Execute periodically
     while(1)
     {
-        base->function_pointers[current_thread](param);        //Function being executed
-        rt_thread_sleep(base->action_period[current_thread]);  //Sleep time
+        //sleep duration = period - ((ticks - offset) % period)
+        uint16_t sleep = base->action_period[current_thread] - ((rt_tick_get() - offset) % base->action_period[current_thread]);
+
+        //Function being executed
+        base->function_pointers[current_thread](param);
+
+        rt_thread_sleep(sleep);
     }
 }
 RTM_EXPORT(next_periodic_thread);

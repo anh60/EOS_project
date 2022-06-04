@@ -17,7 +17,7 @@ struct sensor_temp sensor_temp;
 static uint8_t read_temp()
 {
     //Generate random ADC value from 0 to 2^NBIT
-    uint8_t range = 1 << ADC_NBITS;
+    int16_t range = 1 << ADC_NBITS;
     uint8_t temp = rand() % range;
     return temp;
 }
@@ -30,25 +30,19 @@ static uint8_t read_temp()
  */
 static void store_temp(void *param)
 {
+    rt_kprintf("S_temp %d;   ", rt_tick_get());
     //TODO: STORE TEMP IN MEMORY
     /*Store temperature using store_temp*/
     struct sensor_temp *sensor_temp = param;
-    sensor_temp->flag = 0;
 
-    rt_enter_critical();
+    sensor_temp->flag = 0;
     sensor_temp->temperature = read_temp();
-    rt_exit_critical();
+
 
     // Temperature critically high, trigger sensor flag
     if (sensor_temp->temperature > 200) sensor_temp->flag = 1;
 
-
-
-    /*rt_kprintf("Running store_temp at ticks %d and storing variable %d \n",
-                    rt_tick_get(),
-                    sensor_temp->temperature
-                    ); */
-
+    rt_kprintf("E_temp %d;   \n", rt_tick_get());
 
 
 }

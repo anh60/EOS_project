@@ -70,6 +70,11 @@ int main(void)
     init_threads();
     start_threads();
 
+    while(1)
+    {
+
+    }
+    /*
     int current_time = 0;
     const int target_time = 20000;
     while(current_time < target_time)
@@ -87,6 +92,6 @@ int main(void)
 
         rt_thread_mdelay(20);
     }
-
+    */
     return RT_EOK;
 }

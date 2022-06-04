@@ -68,12 +68,15 @@ static void pressure_store(uint32_t pressure)
  */
 static void pressure_handler(void *param)
 {
+    rt_kprintf("S_press %d;   ", rt_tick_get());
+
     struct sensor_pressure *sensor_pressure = param;
 
    sensor_pressure->pressure = pressure_get();
    pressure_store(sensor_pressure->pressure);
 
-   return;
+   rt_kprintf("S_press %d;   \n", rt_tick_get());
+
 }
 
 

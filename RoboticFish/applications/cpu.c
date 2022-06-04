@@ -10,9 +10,14 @@ struct cpu cpu;
 /* Thread 1 */
 static void cpu_usage(void* param)
 {
+    rt_kprintf("S_cpu %d;   ", rt_tick_get());
     struct cpu *cpu = param;
 
     cpu_usage_get(&cpu->major, &cpu->minor);
+
+    rt_kprintf("E_cpu %d;   \n", rt_tick_get());
+
+
 }
 
 /* Initialize CPU usage */
