@@ -12,12 +12,7 @@ static void cpu_usage(void* param)
 {
     struct cpu *cpu = param;
 
-    //FILE *file = fopen("benchmarks.txt", "a");
-    //fprintf(file, "%d.%d\n", cpu->major, cpu->minor);
-    //fclose(file);
-
-
-   cpu_usage_get(&cpu->major, &cpu->minor);
+    cpu_usage_get(&cpu->major, &cpu->minor);
 }
 
 /* Initialize CPU usage */
