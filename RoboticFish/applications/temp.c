@@ -30,7 +30,6 @@ static uint8_t read_temp()
  */
 static void store_temp(void *param)
 {
-    rt_kprintf("S_temp %d;   ", rt_tick_get());
     //TODO: STORE TEMP IN MEMORY
     /*Store temperature using store_temp*/
     struct sensor_temp *sensor_temp = param;
@@ -41,8 +40,6 @@ static void store_temp(void *param)
 
     // Temperature critically high, trigger sensor flag
     if (sensor_temp->temperature > 200) sensor_temp->flag = 1;
-
-    rt_kprintf("E_temp %d;   \n", rt_tick_get());
 
 
 }
@@ -67,7 +64,7 @@ sensor_temp_t sensor_temp_init(void)
 
 
    /* Initialize thread 1 */
-     sensor_temp.base.threads[TOTAL_THREADS-1] = rt_thread_create("store_temp",  //Name
+     sensor_temp.base.threads[TOTAL_THREADS-1] = rt_thread_create("temp",  //Name
                                                next_periodic_thread,             //Thread
                                                &sensor_temp,                     //Object
                                                STORE_TEMP_THREAD_STACK_SIZE,

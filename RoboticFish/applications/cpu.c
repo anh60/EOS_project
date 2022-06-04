@@ -10,14 +10,9 @@ struct cpu cpu;
 /* Thread 1 */
 static void cpu_usage(void* param)
 {
-    rt_kprintf("S_cpu %d;   ", rt_tick_get());
     struct cpu *cpu = param;
 
     cpu_usage_get(&cpu->major, &cpu->minor);
-
-    rt_kprintf("E_cpu %d;   \n", rt_tick_get());
-
-
 }
 
 /* Initialize CPU usage */
@@ -33,7 +28,7 @@ cpu_t cpu_performance_init(void)
 
 
   /* Initialize thread 1 */
-    cpu.base.threads[TOTAL_THREADS-1] = rt_thread_create("cpu_usage",           //Name
+    cpu.base.threads[TOTAL_THREADS-1] = rt_thread_create("cpu",           //Name
                                                   next_periodic_thread,         //Thread
                                                   &cpu,                         //Object
                                                   CPU_USAGE_THREAD_STACK_SIZE,

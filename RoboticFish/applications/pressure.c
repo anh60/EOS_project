@@ -68,14 +68,10 @@ static void pressure_store(uint32_t pressure)
  */
 static void pressure_handler(void *param)
 {
-    rt_kprintf("S_press %d;   ", rt_tick_get());
-
     struct sensor_pressure *sensor_pressure = param;
 
    sensor_pressure->pressure = pressure_get();
    pressure_store(sensor_pressure->pressure);
-
-   rt_kprintf("S_press %d;   \n", rt_tick_get());
 
 }
 
@@ -104,7 +100,7 @@ sensor_pressure_t sensor_pressure_init(void)
 
     /* Initialize thread 1 */
 
-    sensor_pressure.base.threads[TOTAL_THREADS-1] = rt_thread_create("pressure_thread",
+    sensor_pressure.base.threads[TOTAL_THREADS-1] = rt_thread_create("press",
                                                   next_periodic_thread,
                                                   &sensor_pressure,
                                                   PRESSURE_HANDLER_THREAD_STACK_SIZE,

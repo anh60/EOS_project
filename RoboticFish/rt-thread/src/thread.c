@@ -915,11 +915,19 @@ void next_periodic_thread(void* param)
     //Execute periodically
     while(1)
     {
+        //rt_enter_critical();
+        rt_kprintf("S_%s %d;     ", base->threads[current_thread], rt_tick_get()); //Print start of thread
+        //rt_exit_critical();
+
         //sleep duration = period - ((ticks - offset) % period)
         uint16_t sleep = base->action_period[current_thread] - ((rt_tick_get() - offset) % base->action_period[current_thread]);
 
         //Function being executed
         base->function_pointers[current_thread](param);
+
+        //rt_enter_critical();
+        rt_kprintf("E_%s %d;     \n", base->threads[current_thread], rt_tick_get()); //Print end of thread
+        //rt_exit_critical();
 
         rt_thread_sleep(sleep);
     }

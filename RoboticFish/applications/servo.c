@@ -38,9 +38,10 @@ static int degToPWM(int valDeg)
 
 static void servo_set_positions(void *param)
 {
-    rt_kprintf("S_set %d;   ", rt_tick_get());
-
-    rt_kprintf("E_set %d;   \n", rt_tick_get());
+    for(int i = 0; i < 100; i++)
+    {
+        //Use up ticks
+    }
     // TODO find error handling if no new input has been given 
 
     //set set voltage signals based on servo_value array
@@ -58,7 +59,6 @@ static void servo_set_positions(void *param)
  */
 static void servo_calculate_positions(void *param)
 {
-    rt_kprintf("S_calc %d;     ", rt_tick_get());
     struct servo_motor *servo = param;
     static int index = 0;
     // This is the first delay to synchronize the execution of the two threads
@@ -86,9 +86,6 @@ static void servo_calculate_positions(void *param)
     }
 
     index = (index + 1) % STEPS_PER_REVOLUTION;
-    rt_kprintf("E_calc %d;     ", rt_tick_get());
-    rt_kprintf("\n");
-
 }
 
 /**
@@ -124,14 +121,14 @@ servo_motor_t servo_init (void)
 
 
     // THREAD HANDLING
-    servo.base.threads[TOTAL_THREADS-1] = rt_thread_create("servo_thread_calculate",
+    servo.base.threads[TOTAL_THREADS-1] = rt_thread_create("calc",
                                         next_periodic_thread,
                                         &servo,
                                         CALCULATE_POS_THREAD_STACK_SIZE,
                                         CALCULATE_POS_THREAD_PRIORITY,
                                         CALCULATE_POS_THREAD_TIMESLICE);
 
-    servo.base.threads[TOTAL_THREADS-2]  = rt_thread_create("servo_thread_set",
+    servo.base.threads[TOTAL_THREADS-2]  = rt_thread_create("set",
                                          next_periodic_thread,
                                          &servo,
                                          SET_POS_THREAD_STACK_SIZE,
