@@ -45,5 +45,6 @@ typedef struct servo_motor *servo_motor_t;
 
 servo_motor_t servo_init(void);
 void servo_start(void *param);
+void servo_close(void *param);
 
 #endif /* __SERVO_H__ */

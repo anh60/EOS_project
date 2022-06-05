@@ -85,3 +85,10 @@ void sensor_temp_start(void *param)
     rt_thread_startup(sensor_temp->base.threads[TOTAL_THREADS-1]);
 }
 
+void sensor_temp_close(void *param)
+{
+    struct sensor_temp *sensor_temp = param;
+
+    rt_thread_delete(sensor_temp->base.threads[TOTAL_THREADS-1]);
+}
+

@@ -32,6 +32,8 @@ typedef struct sensor_pressure *sensor_pressure_t;
 
 sensor_pressure_t sensor_pressure_init(void);
 void sensor_pressure_start(void *param);
+void sensor_pressure_close(void *param);
+
 
 
 #endif /* __PRESSURE_H__ */

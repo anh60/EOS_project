@@ -917,7 +917,7 @@ void next_periodic_thread(void* param)
         //Print start time
         rt_enter_critical();
         base->start_tick[current_thread] = rt_tick_get();
-        rt_kprintf("%s = S: %d;     ", base->threads[current_thread]->name, base->start_tick[current_thread]);
+        rt_kprintf("%s=S:%d;\n", base->threads[current_thread]->name, base->start_tick[current_thread]);
         rt_exit_critical();
 
 
@@ -929,7 +929,7 @@ void next_periodic_thread(void* param)
 
         //Print end time
         rt_enter_critical();
-        rt_kprintf("%s = E: %d;     \n", base->threads[current_thread]->name, rt_tick_get());
+        rt_kprintf("%s=E:%d;\n", base->threads[current_thread]->name, rt_tick_get());
         base->end_tick[current_thread] = rt_tick_get();
         rt_exit_critical();
 

@@ -124,5 +124,11 @@ void sensor_pressure_start(void *param)
     rt_thread_startup(sensor_pressure->base.threads[TOTAL_THREADS-1]);
 }
 
+void sensor_pressure_close(void *param)
+{
+    struct sensor_pressure *sensor_pressure = param;
+
+    rt_thread_delete(sensor_pressure->base.threads[TOTAL_THREADS-1]);
+}
 
 

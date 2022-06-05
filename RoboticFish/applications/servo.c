@@ -163,3 +163,11 @@ void servo_start(void *param)
     rt_thread_startup(servo->base.threads[TOTAL_THREADS-2]);
 
 }
+
+void servo_close(void *param)
+{
+    struct servo_motor *servo = param;
+
+    rt_thread_delete(servo->base.threads[TOTAL_THREADS-1]);
+    rt_thread_delete(servo->base.threads[TOTAL_THREADS-2]);
+}

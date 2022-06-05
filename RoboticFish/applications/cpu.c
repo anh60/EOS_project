@@ -51,3 +51,10 @@ void cpu_usage_start(void *param)
     cpu_usage_init();
     rt_thread_startup(cpu->base.threads[TOTAL_THREADS-1]);
 }
+
+void cpu_usage_close(void *param)
+{
+    struct cpu *cpu = param;
+
+    rt_thread_delete(cpu->base.threads[TOTAL_THREADS-1]);
+}

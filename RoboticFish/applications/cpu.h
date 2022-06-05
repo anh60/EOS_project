@@ -25,5 +25,7 @@ typedef struct cpu *cpu_t;
 
 cpu_t cpu_performance_init(void);
 void cpu_usage_start(void *param);
+void cpu_usage_close(void *param);
+
 
 #endif /* __CPU_H__ */

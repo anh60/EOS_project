@@ -53,5 +53,6 @@ typedef struct sensor_temp *sensor_temp_t;
 
 sensor_temp_t sensor_temp_init(void);
 void sensor_temp_start(void *param);
+void sensor_temp_close(void *param);
 
 #endif /* __TEMP_H__ */

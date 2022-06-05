@@ -65,14 +65,27 @@ void start_threads(void)
     sensor_pressure_start(sensor_pressure_1);
 }
 
+void close_threads(void)
+{
+    servo_close(servo_motors);
+    cpu_usage_close(cpu_usage_1);
+    sensor_temp_close(sensor_temp_1);
+    sensor_pressure_close(sensor_pressure_1);
+}
+
 int main(void)
 {
     init_threads();
     start_threads();
 
-    while(1)
+    int current_time = 0;
+    const int target_time = 1000;
+    while(current_time < target_time)
     {
+        current_time = rt_tick_get();
     }
+    close_threads();
+
 
     /*
     int current_time = 0;
