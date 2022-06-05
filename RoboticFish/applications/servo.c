@@ -38,15 +38,17 @@ static int degToPWM(int valDeg)
 
 static void servo_set_positions(void *param)
 {
-    for(int i = 0; i < 100; i++)
+    struct servo_motor *servo = param;
+
+
+
+    for(int i = 0; i < TOTAL_SERVO_MOTORS; i++)
     {
         //Use up ticks
+        //rt_kprintf("Servo_%d set pos \n", i);
     }
     // TODO find error handling if no new input has been given 
-
     //set set voltage signals based on servo_value array
-
-
 }
 
 /**
@@ -60,6 +62,7 @@ static void servo_set_positions(void *param)
 static void servo_calculate_positions(void *param)
 {
     struct servo_motor *servo = param;
+
     static int index = 0;
     // This is the first delay to synchronize the execution of the two threads
     //rt_thread_delay(40 * TICKS_MS);

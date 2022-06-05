@@ -906,30 +906,34 @@ void next_periodic_thread(void* param)
     //Get the value of the first member in the struct
     base_struct *base = (base_struct *)param;
 
-    //Update active threads
-    uint8_t current_thread = TOTAL_THREADS - base->active_threads -1;
-    base->active_threads = base->active_threads + 1;
+    //Update active and current thread
+    const uint8_t current_thread = TOTAL_THREADS - base->active_threads -1;
+    base->active_threads         = base->active_threads + 1;
 
-    //Start tick
-    const int offset = rt_tick_get();
+    base->offset = rt_tick_get();
     //Execute periodically
     while(1)
     {
-        //rt_enter_critical();
-        rt_kprintf("S_%s %d;     ", base->threads[current_thread], rt_tick_get()); //Print start of thread
-        //rt_exit_critical();
+        //Print start time
+        rt_enter_critical();
+        base->start_tick[current_thread] = rt_tick_get();
+        rt_kprintf("%s = S: %d;     ", base->threads[current_thread]->name, base->start_tick[current_thread]);
+        rt_exit_critical();
 
-        //sleep duration = period - ((ticks - offset) % period)
-        uint16_t sleep = base->action_period[current_thread] - ((rt_tick_get() - offset) % base->action_period[current_thread]);
 
         //Function being executed
         base->function_pointers[current_thread](param);
+        //sleep duration = period - ((ticks - offset) % period)
+        base->sleep_duration[current_thread] = base->action_period[current_thread] - ((base->start_tick[current_thread] - base->offset) % base->action_period[current_thread]);
 
-        //rt_enter_critical();
-        rt_kprintf("E_%s %d;     \n", base->threads[current_thread], rt_tick_get()); //Print end of thread
-        //rt_exit_critical();
 
-        rt_thread_sleep(sleep);
+        //Print end time
+        rt_enter_critical();
+        rt_kprintf("%s = E: %d;     \n", base->threads[current_thread]->name, rt_tick_get());
+        base->end_tick[current_thread] = rt_tick_get();
+        rt_exit_critical();
+
+        rt_thread_sleep(base->sleep_duration[current_thread]);
     }
 }
 RTM_EXPORT(next_periodic_thread);

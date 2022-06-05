@@ -40,8 +40,6 @@ static void store_temp(void *param)
 
     // Temperature critically high, trigger sensor flag
     if (sensor_temp->temperature > 200) sensor_temp->flag = 1;
-
-
 }
 
 

@@ -55,8 +55,6 @@ static void pressure_store(uint32_t pressure)
 
 
     flash_addr += 16;
-
-    return;
 }
 
 /**
@@ -70,9 +68,9 @@ static void pressure_handler(void *param)
 {
     struct sensor_pressure *sensor_pressure = param;
 
+
    sensor_pressure->pressure = pressure_get();
    pressure_store(sensor_pressure->pressure);
-
 }
 
 
@@ -124,8 +122,6 @@ void sensor_pressure_start(void *param)
     struct sensor_pressure *sensor_pressure = param;
 
     rt_thread_startup(sensor_pressure->base.threads[TOTAL_THREADS-1]);
-
-    return;
 }
 
 

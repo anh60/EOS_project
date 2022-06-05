@@ -24,6 +24,12 @@ typedef struct {
     void (*function_pointers[TOTAL_THREADS])(void *parameter);
     /*Action period for periodic thread*/
     uint16_t action_period[TOTAL_THREADS];
+
+
+    int offset;
+    int start_tick[TOTAL_THREADS];
+    int end_tick[TOTAL_THREADS];
+    int sleep_duration[TOTAL_THREADS];
 } base_struct;
 
 #endif /* __BASE_H__ */
