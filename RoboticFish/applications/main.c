@@ -73,6 +73,19 @@ void close_threads(void)
     sensor_pressure_close(sensor_pressure_1);
 }
 
+void main_normal(void)
+{
+
+}
+
+void main_cpu(void)
+{
+    rt_enter_critical();
+    rt_kprintf("%=%d.%d;S:%d;E:%d;\n", cpu_usage_1->major, cpu_usage_1->minor, cpu_usage_1->base.start_tick[TOTAL_THREADS-1], cpu_usage_1->base.end_tick[TOTAL_THREADS-1]);
+    rt_exit_critical();
+
+    rt_thread_mdelay(20);
+}
 int main(void)
 {
     init_threads();
@@ -83,6 +96,8 @@ int main(void)
     while(current_time < target_time)
     {
         current_time = rt_tick_get();
+        main_normal();
+        //main_cpu();
     }
     close_threads();
 
