@@ -86,6 +86,7 @@ void main_cpu(void)
 
     rt_thread_mdelay(20);
 }
+
 int main(void)
 {
     init_threads();
@@ -96,8 +97,8 @@ int main(void)
     while(current_time < target_time)
     {
         current_time = rt_tick_get();
-        main_normal();
-        //main_cpu();
+        //main_normal();
+        main_cpu();
     }
     close_threads();
 
