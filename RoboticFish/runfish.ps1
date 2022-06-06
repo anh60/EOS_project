@@ -19,7 +19,6 @@ function Set-Logfile() {
 }
 
 function Write-Log() {   
-    $logfile = ""
     $logfile = Set-Logfile
     Write-Output "$logfile at $currentFile"
 
@@ -40,6 +39,24 @@ function Write-Log() {
 
 }
      
+function Write-CodeDiff($numberOfPeriodicTask) {
+    $logfile = Set-Logfile
+
+    $baseLength = 35 #Code length periodic function
+    $commonLength = 4 #"Duplication" of code, function decleration etc.
+    $codeLengthWithOSChanges = (([int]$numberOfPeriodicTask * $commonLength) + $baseLength)
+    $codeLengthWithoutOSChanges = ([int]$numberOfPeriodicTask * $baseLength)
+
+    Write-Output " With OS changes: $codeLengthWithOSChanges "
+    Write-Output " Without OS changes: $codeLengthWithoutOSChanges "
+    
+    $codeDiff = $codeLengthWithOSChanges - $codeLengthWithoutOSChanges
+
+    Write-Output " Difference in length: $codeDiff "
+    
+    $codeDiff | Out-File $logfile
+}
+
 
 if ($q -eq '1') {
     & $qemupath `
@@ -50,14 +67,22 @@ if ($q -eq '1') {
         -kernel Debug/rtthread.bin
 } 
 elseif ($q -eq '2') {
+    Write-Output " "
     Write-Output "Select type of benchmark"
     Write-Output "  Thread start and end time                       [1]"
     Write-Output "  Thread start and end time  + CPU usage          [2]"
     Write-Output "  CPU usage                                       [3]"
-    Write-Output "  Thread start and end time without OS changes    [4]"
+    Write-Output "  Code length with vs without OS changes          [4]"
     $type = Read-Host " "
 
-    Write-Log
+    if ($type -eq '4') {
+        Write-Output "  How many periodic tasks do you have?"
+        $tasks = Read-Host " "
+        Write-CodeDiff($tasks)
+    }
+    else {
+        Write-Log
+    }
 }
 else {
     Write-Output "nope"
