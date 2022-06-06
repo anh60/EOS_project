@@ -13,7 +13,6 @@ static void cpu_usage(void* param)
     struct cpu *cpu = param;
 
     cpu_usage_get(&cpu->major, &cpu->minor);
-    //rt_kprintf("CPU USAGE: %d.%d%;", cpu->major, cpu->minor);
 }
 
 /* Initialize CPU usage */

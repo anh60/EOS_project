@@ -12,7 +12,8 @@ function Set-Logfile() {
         1 { $file = "benchmarking/benchmarks_startend.txt"; break }
         2 { $file = "benchmarking/benchmarks_startend_cpu.txt"; break }
         3 { $file = "benchmarking/benchmarks_cpu.txt"; break }
-        Default {}
+        4 { $file = "benchmarking/benchmarks_startend_without_OS_changes.txt"; break }
+        Default { $file = "benchmarking/benchmarks_undefined.txt"; break }
     }
     return $file
 }
@@ -50,9 +51,10 @@ if ($q -eq '1') {
 } 
 elseif ($q -eq '2') {
     Write-Output "Select type of benchmark"
-    Write-Output "  Thread start and end time              [1]"
-    Write-Output "  Thread start and end time  + CPU usage [2]"
-    Write-Output "  CPU usage                              [3]"
+    Write-Output "  Thread start and end time                       [1]"
+    Write-Output "  Thread start and end time  + CPU usage          [2]"
+    Write-Output "  CPU usage                                       [3]"
+    Write-Output "  Thread start and end time without OS changes    [4]"
     $type = Read-Host " "
 
     Write-Log
