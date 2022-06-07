@@ -24,6 +24,11 @@
 #define STORE_TEMP_THREAD_TIMESLICE     5
 #define STORE_TEMP_THREAD_ACTION_PERIOD (100 * TICKS_MS)   /* 1 seconds = 1000 ticks */
 
+//EXTREME_TEMP_HANDLER
+#define EXTREME_TEMP_HANDLER_THREAD_STACK_SIZE    2048
+#define EXTREME_TEMP_HANDLER_THREAD_PRIORITY      1
+#define EXTREME_TEMP_HANDLER_THREAD_TIMESLICE     5
+
 
 /**
  * @brief Object containing independent threads and the temperature variable
