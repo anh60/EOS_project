@@ -3,6 +3,8 @@
 #include <rtdef.h>
 
 #include "temp.h"
+#include "flash.h"
+
 
 struct sensor_temp sensor_temp;
 
@@ -40,6 +42,22 @@ static void store_temp(void *param)
 
     // Temperature critically high, trigger sensor flag
     if (sensor_temp->temperature > 200) sensor_temp->flag = 1;
+
+    static int flash_addr = ADDR_FLASH_SECTOR_4;
+
+    // Unlock flash memory
+    rt_enter_critical();
+    HAL_FLASH_Unlock();
+
+    FLASH_Program_Word(flash_addr, sensor_temp->temperature);
+
+    // Lock flash memory
+    HAL_FLASH_Lock();
+    rt_exit_critical();
+
+
+    flash_addr += 16;
+
 }
 
 
