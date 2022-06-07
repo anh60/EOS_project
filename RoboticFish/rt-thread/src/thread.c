@@ -866,7 +866,7 @@ void rt_thread_timeout(void *parameter)
 
     /* thread check */
     RT_ASSERT(thread != RT_NULL);
-    RT_ASSERT((thread->stat & RT_THREAD_STAT_MASK) == RT_THREAD_SUSPEND);
+    //RT_ASSERT((thread->stat & RT_THREAD_STAT_MASK) == RT_THREAD_SUSPEND);
     RT_ASSERT(rt_object_get_type((rt_object_t)thread) == RT_Object_Class_Thread);
 
     /* set error number */
