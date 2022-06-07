@@ -89,6 +89,8 @@ void main_cpu(void)
 
 void main_demo(int current_time)
 {
+    rt_enter_critical();
+
     rt_kprintf("T: %d;    \n", current_time);
     rt_kprintf("CPU: %d.%d%; S: %d; E: %d;      ",        cpu_usage_1->major, cpu_usage_1->minor, cpu_usage_1->base.start_tick[TOTAL_THREADS-1], cpu_usage_1->base.end_tick[TOTAL_THREADS-1]);
     rt_kprintf("TEMP: %d; %d; S: %d; E: %d;    ",           sensor_temp_1->flag, sensor_temp_1->temperature, sensor_temp_1->base.start_tick[TOTAL_THREADS-1], sensor_temp_1->base.end_tick[TOTAL_THREADS-1]);
@@ -96,6 +98,8 @@ void main_demo(int current_time)
     rt_kprintf("PRESS: %d; S: %d; E: %d;   ",                sensor_pressure_1->pressure, sensor_pressure_1->base.start_tick[TOTAL_THREADS-1], sensor_pressure_1->base.end_tick[TOTAL_THREADS-1]);
 
     rt_kprintf("\n");
+    rt_exit_critical();
+    rt_thread_mdelay(5);
 }
 
 int main(void)
@@ -108,9 +112,9 @@ int main(void)
     while(current_time < target_time)
     {
         current_time = rt_tick_get();
-        main_normal();
+        //main_normal();
         //main_cpu();
-        //main_demo(current_time);
+        main_demo(current_time);
     }
     close_threads();
 

@@ -74,7 +74,6 @@ void extreme_temp_handler(void *param)
     while(1)
     {
 
-    /* The first time the event is received, either event 3 or event 5 can trigger thread 1, clearing the event flag after receiving */
         if (rt_event_recv(&event, EVENT_FLAG1,
                       RT_EVENT_FLAG_OR | RT_EVENT_FLAG_CLEAR,
                       RT_WAITING_FOREVER, &e) == RT_EOK)
@@ -87,7 +86,7 @@ void extreme_temp_handler(void *param)
             sensor_temp->base.start_tick[0] = current_time;
             sensor_temp->flag = 1;
 
-            rt_kprintf("Too hot! Cooling down:");
+            rt_kprintf("%s=S:%d;\n", sensor_temp->base.threads[0]->name, sensor_temp->base.start_tick[0]);
 
             while(current_time < target_time)
             {
@@ -96,7 +95,7 @@ void extreme_temp_handler(void *param)
 
             sensor_temp->base.end_tick[0] = current_time;
 
-            rt_kprintf("S:%d E:%d\n", sensor_temp->base.start_tick[0], sensor_temp->base.end_tick[0]);
+            rt_kprintf("%s=E:%d;\n", sensor_temp->base.threads[0]->name, sensor_temp->base.end_tick[0]);
 
             rt_exit_critical();
         }
