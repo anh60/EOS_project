@@ -53,8 +53,15 @@ function Write-CodeDiff($numberOfPeriodicTask) {
     $codeDiff = $codeLengthWithOSChanges - $codeLengthWithoutOSChanges
 
     Write-Output " Difference in length: $codeDiff "
+
+    "" | Out-File $logfile
+    Add-Content $logfile "Number of periodic threads: $numberOfPeriodicTask "
+    Add-Content $logfile "With OS changes: $codeLengthWithOSChanges "
+    Add-Content $logfile "Without OS changes: $codeLengthWithoutOSChanges"
+    Add-Content $logfile "Difference in length: $codeDiff "
     
-    $codeDiff | Out-File $logfile
+
+    
 }
 
 
