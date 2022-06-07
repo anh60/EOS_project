@@ -46,13 +46,14 @@ static void pressure_store(uint32_t pressure)
     static int flash_addr = ADDR_FLASH_SECTOR_4;
     
     // Unlock flash memory
+    rt_enter_critical();
     HAL_FLASH_Unlock();
 
     FLASH_Program_Word(flash_addr, pressure);
 
     // Lock flash memory
     HAL_FLASH_Lock();
-
+    rt_exit_critical();
 
     flash_addr += 16;
 }
