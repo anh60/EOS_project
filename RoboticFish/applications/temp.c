@@ -43,11 +43,6 @@ static void store_temp(void *param)
     sensor_temp->flag = 0;
     sensor_temp->temperature = read_temp();
 
-
-    // Temperature critically high, trigger event flag
-    if (sensor_temp->temperature > 200) rt_event_send(&event, EVENT_FLAG1);
-
-
     static int flash_addr = ADDR_FLASH_SECTOR_4;
 
     // Unlock flash memory
@@ -63,6 +58,8 @@ static void store_temp(void *param)
 
     flash_addr += 16;
 
+    // Temperature critically high, trigger event flag
+    if (sensor_temp->temperature > 200) rt_event_send(&event, EVENT_FLAG1);
 }
 
 void extreme_temp_handler(void *param)
@@ -87,6 +84,7 @@ void extreme_temp_handler(void *param)
             sensor_temp->flag = 1;
 
             rt_kprintf("%s=S:%d;\n", sensor_temp->base.threads[0]->name, sensor_temp->base.start_tick[0]);
+            rt_kprintf("temp=%d;\n", sensor_temp->temperature);
 
             while(current_time < target_time)
             {
@@ -98,6 +96,9 @@ void extreme_temp_handler(void *param)
             rt_kprintf("%s=E:%d;\n", sensor_temp->base.threads[0]->name, sensor_temp->base.end_tick[0]);
 
             rt_exit_critical();
+        } else
+        {
+            rt_thread_sleep(10);
         }
     }
 }
