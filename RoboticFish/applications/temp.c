@@ -84,7 +84,7 @@ void extreme_temp_handler(void *param)
             sensor_temp->flag = 1;
 
             rt_kprintf("%s=S:%d;\n", sensor_temp->base.threads[0]->name, sensor_temp->base.start_tick[0]);
-            rt_kprintf("temp=%d;\n", sensor_temp->temperature);
+            rt_kprintf("temp=T:%d;\n", sensor_temp->temperature);
 
             while(current_time < target_time)
             {
