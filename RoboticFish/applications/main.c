@@ -25,6 +25,13 @@ cpu_t               cpu_usage_1;
 /* Initialize objects */
 int init_threads(void)
 {
+    //cpu usage
+    cpu_usage_1 = cpu_performance_init();
+    if(!cpu_usage_1) {
+        rt_kprintf("Failed to initialize cpu usage");
+        return RT_ERROR;
+    }
+
     //servo
     servo_motors = servo_init();
     if(!servo_motors) {
@@ -46,29 +53,22 @@ int init_threads(void)
         return RT_ERROR;
     }
 
-    //cpu usage
-    cpu_usage_1 = cpu_performance_init();
-    if(!cpu_usage_1) {
-        rt_kprintf("Failed to initialize cpu usage");
-        return RT_ERROR;
-    }
-
     return 0;
 }
 
 void start_threads(void)
 {
     //Start threads in objects
-    servo_start(servo_motors);
     cpu_usage_start(cpu_usage_1);
+    servo_start(servo_motors);
     sensor_temp_start(sensor_temp_1);
     sensor_pressure_start(sensor_pressure_1);
 }
 
 void close_threads(void)
 {
-    servo_close(servo_motors);
     cpu_usage_close(cpu_usage_1);
+    servo_close(servo_motors);
     sensor_temp_close(sensor_temp_1);
     sensor_pressure_close(sensor_pressure_1);
 }
