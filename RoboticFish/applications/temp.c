@@ -114,7 +114,7 @@ sensor_temp_t sensor_temp_init(void)
     sensor_temp.temperature          = 0;
     sensor_temp.flag                 = 0;
    /* Initialize base variables */
-    sensor_temp.base.active_threads       = 0;
+    sensor_temp.base.active_periodic_threads            = 0;
     sensor_temp.base.function_pointers[TOTAL_THREADS-1] = store_temp;
     sensor_temp.base.action_period[TOTAL_THREADS-1]     = STORE_TEMP_THREAD_ACTION_PERIOD;
 

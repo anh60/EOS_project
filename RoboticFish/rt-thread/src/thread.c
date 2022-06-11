@@ -907,10 +907,10 @@ void next_periodic_thread(void* param)
     base_struct *base = (base_struct *)param;
 
     //Update active and current thread
-    const uint8_t current_thread = TOTAL_THREADS - base->active_threads -1;
-    base->active_threads         = base->active_threads + 1;
+    const uint8_t current_thread  = TOTAL_THREADS - base->active_periodic_threads -1;
+    base->active_periodic_threads = base->active_periodic_threads + 1;
 
-    base->offset = rt_tick_get();
+    base->offset[current_thread] = rt_tick_get();
     //Execute periodically
     while(1)
     {
@@ -924,7 +924,7 @@ void next_periodic_thread(void* param)
         //Function being executed
         base->function_pointers[current_thread](param);
         //sleep duration = period - ((ticks - offset) % period)
-        base->sleep_duration[current_thread] = base->action_period[current_thread] - ((base->start_tick[current_thread] - base->offset) % base->action_period[current_thread]);
+        base->sleep_duration[current_thread] = base->action_period[current_thread] - ((base->start_tick[current_thread] - base->offset[current_thread]) % base->action_period[current_thread]);
 
 
         //Comment out for real use, currently simulating uses of ticks

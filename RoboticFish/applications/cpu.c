@@ -22,7 +22,7 @@ cpu_t cpu_performance_init(void)
     cpu.major = 0;
     cpu.minor = 0;
   /* Initialize base variables */
-    cpu.base.active_threads  = 0;
+    cpu.base.active_periodic_threads            = 0;
     cpu.base.function_pointers[TOTAL_THREADS-1] = cpu_usage;
     cpu.base.action_period[TOTAL_THREADS-1]     = CPU_USAGE_THREAD_ACTION_PERIOD;
 
