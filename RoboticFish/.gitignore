@@ -37,3 +37,8 @@ settings/
 *.uvguix*
 .project
 .config
+benchmarking/benchmarks_cpu.txt
+benchmarking/benchmarks_startend_without_OS_changes.txt
+benchmarking/benchmarks_startend_cpu.txt
+benchmarking/benchmarks_startend.txt
+benchmarking/benchmarks_undefined.txt
