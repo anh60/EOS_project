@@ -72,7 +72,8 @@ if ($q -eq '1') {
         -M stm32f401-st-nucleo `
         -sd sd.bin `
         -serial stdio `
-        -monitor null -nographic `
+        -monitor null `
+        -nographic `
         -kernel Debug/rtthread.bin
 } 
 elseif ($q -eq '2') {
