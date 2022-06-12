@@ -17,12 +17,12 @@
 #ifndef __SERVO_H__
 #define __SERVO_H__
 //SET
-#define SET_POS_THREAD_PRIORITY         1
+#define SET_POS_THREAD_PRIORITY         2
 #define SET_POS_THREAD_STACK_SIZE       2048
 #define SET_POS_THREAD_TIMESLICE        5
 #define SET_POS_ACTION_PERIOD           (50 * TICKS_MS) //Should activate every 50 ms
 //CALCULATE
-#define CALCULATE_POS_THREAD_PRIORITY   2
+#define CALCULATE_POS_THREAD_PRIORITY   3
 #define CALCULATE_POS_THREAD_STACK_SIZE 2048
 #define CALCULATE_POS_THREAD_TIMESLICE  5
 #define CALCULATE_POS_ACTION_PERIOD     (50 * TICKS_MS) //Should activate every 50 ms

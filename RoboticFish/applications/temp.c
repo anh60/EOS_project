@@ -8,6 +8,10 @@
 
 struct sensor_temp sensor_temp;
 
+static struct rt_event event;
+#define EVENT_FLAG1 1
+
+
 
 /**
  * @brief Thread generating mock data to simulate readings from a temperature sensor.
@@ -39,10 +43,6 @@ static void store_temp(void *param)
     sensor_temp->flag = 0;
     sensor_temp->temperature = read_temp();
 
-
-    // Temperature critically high, trigger sensor flag
-    if (sensor_temp->temperature > 200) sensor_temp->flag = 1;
-
     static int flash_addr = ADDR_FLASH_SECTOR_4;
 
     // Unlock flash memory
@@ -58,8 +58,50 @@ static void store_temp(void *param)
 
     flash_addr += 16;
 
+    // Temperature critically high, trigger event flag
+    if (sensor_temp->temperature > 200) rt_event_send(&event, EVENT_FLAG1);
 }
 
+void extreme_temp_handler(void *param)
+{
+    struct sensor_temp *sensor_temp = param;
+
+    rt_uint32_t e;
+
+    while(1)
+    {
+
+        if (rt_event_recv(&event, EVENT_FLAG1,
+                      RT_EVENT_FLAG_OR | RT_EVENT_FLAG_CLEAR,
+                      RT_WAITING_FOREVER, &e) == RT_EOK)
+        {
+            //Cool down for 120 ms
+            rt_enter_critical();
+            int current_time = rt_tick_get();
+            int target_time = current_time + 120;
+
+            sensor_temp->base.start_tick[0] = current_time;
+            sensor_temp->flag = 1;
+
+            rt_kprintf("%s=S:%d;\n", sensor_temp->base.threads[0]->name, sensor_temp->base.start_tick[0]);
+            rt_kprintf("temp=T:%d;\n", sensor_temp->temperature);
+
+            while(current_time < target_time)
+            {
+                current_time = rt_tick_get();
+            }
+
+            sensor_temp->base.end_tick[0] = current_time;
+
+            rt_kprintf("%s=E:%d;\n", sensor_temp->base.threads[0]->name, sensor_temp->base.end_tick[0]);
+
+            rt_exit_critical();
+        } else
+        {
+            rt_thread_sleep(10);
+        }
+    }
+}
 
 
 /**
@@ -73,7 +115,7 @@ sensor_temp_t sensor_temp_init(void)
     sensor_temp.temperature          = 0;
     sensor_temp.flag                 = 0;
    /* Initialize base variables */
-    sensor_temp.base.active_threads       = 0;
+    sensor_temp.base.active_periodic_threads            = 0;
     sensor_temp.base.function_pointers[TOTAL_THREADS-1] = store_temp;
     sensor_temp.base.action_period[TOTAL_THREADS-1]     = STORE_TEMP_THREAD_ACTION_PERIOD;
 
@@ -92,8 +134,24 @@ sensor_temp_t sensor_temp_init(void)
          return RT_NULL;
 
 
+     /* Initialize thread 2 */
+          sensor_temp.base.threads[0] = rt_thread_create("extemp",  //Name
+                                                    extreme_temp_handler,         //Thread
+                                                    &sensor_temp,                 //Object
+                                                    STORE_TEMP_THREAD_STACK_SIZE,
+                                                    STORE_TEMP_THREAD_PRIORITY,
+                                                    STORE_TEMP_THREAD_TIMESLICE
+                                                    );
+
+      if(!sensor_temp.base.threads[0])
+           return RT_NULL;
+
+
+      rt_event_init(&event, "event", RT_IPC_FLAG_FIFO);
+
     return &sensor_temp;
 }
+
 
 /* Start threads */
 void sensor_temp_start(void *param)
@@ -101,6 +159,8 @@ void sensor_temp_start(void *param)
     struct sensor_temp *sensor_temp = param;
 
     rt_thread_startup(sensor_temp->base.threads[TOTAL_THREADS-1]);
+    rt_thread_startup(sensor_temp->base.threads[0]);
+
 }
 
 void sensor_temp_close(void *param)
@@ -108,5 +168,6 @@ void sensor_temp_close(void *param)
     struct sensor_temp *sensor_temp = param;
 
     rt_thread_delete(sensor_temp->base.threads[TOTAL_THREADS-1]);
+    rt_thread_delete(sensor_temp->base.threads[0]);
 }
 

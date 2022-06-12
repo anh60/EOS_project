@@ -866,7 +866,7 @@ void rt_thread_timeout(void *parameter)
 
     /* thread check */
     RT_ASSERT(thread != RT_NULL);
-    RT_ASSERT((thread->stat & RT_THREAD_STAT_MASK) == RT_THREAD_SUSPEND);
+    //RT_ASSERT((thread->stat & RT_THREAD_STAT_MASK) == RT_THREAD_SUSPEND);
     RT_ASSERT(rt_object_get_type((rt_object_t)thread) == RT_Object_Class_Thread);
 
     /* set error number */
@@ -907,29 +907,38 @@ void next_periodic_thread(void* param)
     base_struct *base = (base_struct *)param;
 
     //Update active and current thread
-    const uint8_t current_thread = TOTAL_THREADS - base->active_threads -1;
-    base->active_threads         = base->active_threads + 1;
+    const uint8_t current_thread  = TOTAL_THREADS - base->active_periodic_threads -1;
+    base->active_periodic_threads = base->active_periodic_threads + 1;
 
-    base->offset = rt_tick_get();
+    base->offset[current_thread] = rt_tick_get();
     //Execute periodically
     while(1)
     {
         //Print start time
         rt_enter_critical();
         base->start_tick[current_thread] = rt_tick_get();
-        rt_kprintf("%s=S:%d;\n", base->threads[current_thread]->name, base->start_tick[current_thread]);
+        //rt_kprintf("%s=S:%d;\n", base->threads[current_thread]->name, base->start_tick[current_thread]);
         rt_exit_critical();
 
 
         //Function being executed
         base->function_pointers[current_thread](param);
         //sleep duration = period - ((ticks - offset) % period)
-        base->sleep_duration[current_thread] = base->action_period[current_thread] - ((base->start_tick[current_thread] - base->offset) % base->action_period[current_thread]);
+        base->sleep_duration[current_thread] = base->action_period[current_thread] - ((base->start_tick[current_thread] - base->offset[current_thread]) % base->action_period[current_thread]);
 
+
+        //Comment out for real use, currently simulating uses of ticks
+        //All threads uses +3 ticks
+        int current_time = rt_tick_get();
+        int target_time = current_time + 3;
+        while(current_time < target_time)
+        {
+            current_time = rt_tick_get();
+        }
 
         //Print end time
         rt_enter_critical();
-        rt_kprintf("%s=E:%d;\n", base->threads[current_thread]->name, rt_tick_get());
+        //rt_kprintf("%s=E:%d;\n", base->threads[current_thread]->name, rt_tick_get());
         base->end_tick[current_thread] = rt_tick_get();
         rt_exit_critical();
 

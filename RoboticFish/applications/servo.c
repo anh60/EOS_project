@@ -116,7 +116,7 @@ servo_motor_t servo_init (void)
 
     }
     /* Initialize base variables */
-    servo.base.active_threads                     = 0;
+    servo.base.active_periodic_threads            = 0;
     servo.base.function_pointers[TOTAL_THREADS-1] = servo_calculate_positions;
     servo.base.function_pointers[TOTAL_THREADS-2] = servo_set_positions;
     servo.base.action_period[TOTAL_THREADS-1]     = CALCULATE_POS_ACTION_PERIOD;

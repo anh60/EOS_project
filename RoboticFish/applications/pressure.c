@@ -91,7 +91,7 @@ sensor_pressure_t sensor_pressure_init(void)
     /* Initialize sensor variables */
     sensor_pressure.pressure = 0;
     /* Initialize base variables */
-    sensor_pressure.base.active_threads                     = 0;
+    sensor_pressure.base.active_periodic_threads            = 0;
     sensor_pressure.base.function_pointers[TOTAL_THREADS-1] = pressure_handler;
     sensor_pressure.base.action_period[TOTAL_THREADS-1]     = PRESSURE_HANDLER_THREAD_ACTION_PERIOD;
 
