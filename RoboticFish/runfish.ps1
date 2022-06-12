@@ -85,7 +85,7 @@ elseif ($q -eq '2') {
     $type = Read-Host " "
 
     if ($type -eq '4') {
-        Write-Output "  How many periodic tasks do you have?"
+        Write-Output "  How many periodic threads do you have?"
         $tasks = Read-Host " "
         Write-CodeDiff($tasks)
     }
