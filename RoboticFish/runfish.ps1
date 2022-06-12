@@ -3,6 +3,8 @@ $qemupath = "C:/RT-ThreadStudio/repo/Extract/Debugger_Support_Packages/RealThrea
 Write-Output ""
 Write-Output "Run in terminal   [1]"
 Write-Output "Save to file      [2]"
+Write-Output "Plot benchmark    [3]"
+
 Write-Output "What to do?     "
 $q = Read-Host " "
 
@@ -90,6 +92,10 @@ elseif ($q -eq '2') {
     else {
         Write-Log
     }
+}
+elseif ($q -eq '3') {
+    python ./benchmarking/data_representation.py
+
 }
 else {
     Write-Output "nope"
