@@ -56,12 +56,12 @@ def plot_charts():
     with_imp = []
     without_imp = []
     x = np.arange(50)
-    base = 38
+    base = 35
     spesific = 4
 
     for i in range(50):
-        with_imp.append(i+base)
-        without_imp.append((i*spesific)+base)
+        with_imp.append(i+spesific)
+        without_imp.append((i*base)+spesific)
         diff.append(without_imp[i] - with_imp[i])
 
     
@@ -114,7 +114,6 @@ def plot_charts():
     plt.figure(2)
     plt.plot(x, with_imp, label = "With improvements")
     plt.plot(x, without_imp, label= "Without improvements")
-    plt.plot(x, diff, label= "Difference")
 
     plt.title("Code lenght for general case")
     plt.xlabel("Number of threads")
@@ -288,36 +287,44 @@ def plot_gantt():
     while i < len(data) and i != -1:
 
         i = data.find("temp=S:", i)
-        if i == -1: 
+        if i == -1:
             break
-        elif data[i+8] == ';':
-            start = int(data[i+7])
-        elif data[i+9] == ';':
-            start = int(data[i+7] + data[i+8])
-        elif data[i+10] == ';':
-            start = int(data[i+7] + data[i+8]+ data[i+9])
-        elif data[i+11] == ';':
-            start = int(data[i+7] + data[i+8]+ data[i+9] + data[i+10])
+        if data[i-1] != 'x':
+            
+            if data[i+8] == ';':
+                start = int(data[i+7])
+            elif data[i+9] == ';':
+                start = int(data[i+7] + data[i+8])
+            elif data[i+10] == ';':
+                start = int(data[i+7] + data[i+8]+ data[i+9])
+            elif data[i+11] == ';':
+                start = int(data[i+7] + data[i+8]+ data[i+9] + data[i+10])
         
         i = data.find("temp=E:", i)
-        if i == -1: 
+        if i == -1:
             break
-        elif data[i+8] == ';':
-            finish = int(data[i+7])
-            df1 = pd.DataFrame([dict(Task="Temperature Thread", Start=start, Finish=finish)] , columns=['Task', 'Start', 'Finish'])
-            df_list.append(df1)
-        elif data[i+9] == ';':
-            finish = int(data[i+7] + data[i+8])
-            df1 = pd.DataFrame([dict(Task="Temperature Thread", Start=start, Finish=finish)] , columns=['Task', 'Start', 'Finish'])
-            df_list.append(df1)
-        elif data[i+10] == ';':
-            finish = int(data[i+7] + data[i+8]+ data[i+9])
-            df1 = pd.DataFrame([dict(Task="Temperature Thread", Start=start, Finish=finish)] , columns=['Task', 'Start', 'Finish'])
-            df_list.append(df1)
-        elif data[i+11] == ';':
-            finish = int(data[i+7] + data[i+8]+ data[i+9] + data[i+10])
-            df1 = pd.DataFrame([dict(Task="Temperature Thread", Start=start, Finish=finish)] , columns=['Task', 'Start', 'Finish'])
-            df_list.append(df1)
+
+        if data[i-1] == 'x':
+            i = i+7
+            i = data.find("temp=E:", i)
+
+        if data[i-1] != 'x':
+            if data[i+8] == ';':
+                finish = int(data[i+7])
+                df1 = pd.DataFrame([dict(Task="Temperature Thread", Start=start, Finish=finish)] , columns=['Task', 'Start', 'Finish'])
+                df_list.append(df1)
+            elif data[i+9] == ';':
+                finish = int(data[i+7] + data[i+8])
+                df1 = pd.DataFrame([dict(Task="Temperature Thread", Start=start, Finish=finish)] , columns=['Task', 'Start', 'Finish'])
+                df_list.append(df1)
+            elif data[i+10] == ';':
+                finish = int(data[i+7] + data[i+8]+ data[i+9])
+                df1 = pd.DataFrame([dict(Task="Temperature Thread", Start=start, Finish=finish)] , columns=['Task', 'Start', 'Finish'])
+                df_list.append(df1)
+            elif data[i+11] == ';':
+                finish = int(data[i+7] + data[i+8]+ data[i+9] + data[i+10])
+                df1 = pd.DataFrame([dict(Task="Temperature Thread", Start=start, Finish=finish)] , columns=['Task', 'Start', 'Finish'])
+                df_list.append(df1)
 
     i = 0
         # EXTREME TEMPERATURE THREAD  
