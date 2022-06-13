@@ -1,3 +1,4 @@
+from cProfile import label
 from unicodedata import name
 import numpy as np
 import matplotlib.pyplot as plt
@@ -18,8 +19,52 @@ def readFile(filename):
     return string 
 
 
-def plot_CPU_usage():
+def plot_charts():
 
+    # SPESIFIC CODE LENGTH
+    content = readFile("benchmarking/benchmarks_startend_without_OS_changes.txt")
+    data = []
+    data.append(content.split(": ")[1])
+    data.append(content.split(": ")[2])
+    data.append(content.split(": ")[3])
+    data.append(content.split(": ")[4])
+
+    data[0] = data[0].split(" \r")[0]
+    data[1] = data[1].split(" \r")[0]
+    data[1] = int(data[1])
+    data[2] = data[2].split("\r")[0]
+    data[2] = int(data[2])
+    data[3] = data[3].split(" \r")[0]
+    data[3] = abs(int(data[3]))
+
+    title = "Improvement in lines of code for " + data[0] + " threads"
+    
+    data = [data[1], data[2], data[3]]
+    bar_titles = ["with improvement", "without improvement", "difference"]
+
+
+    # SPESIFIC CODE LENGHT FIGURE
+    plt.figure(1)
+    plt.bar(bar_titles, data)
+    plt.title(title)
+    plt.ylabel("Lines of code")
+    plt.xticks(["with improvement", "without improvement", "difference"])
+    
+    # GENERAL CASE CODE LENGHT
+    diff =[]
+    with_imp = []
+    without_imp = []
+    x = np.arange(50)
+    base = 38
+    spesific = 4
+
+    for i in range(50):
+        with_imp.append(i+base)
+        without_imp.append((i*spesific)+base)
+        diff.append(without_imp[i] - with_imp[i])
+
+    
+    # CPU USAGE
     data = readFile("benchmarking/benchmarks_cpu.txt")
     arr_CPUUsage = []
 
@@ -46,53 +91,37 @@ def plot_CPU_usage():
     CPU_usage_mean = a.mean(0)
     # CALCULATE STD DEV
     CPU_usage_std = a.std()
-    
-    # DATA VISUALIZATION
-    y = np.arange(len(a))
-    plt.plot(y, a)
 
     textstr = '\n'.join((
         r'$\mu=%.2f$' % (CPU_usage_mean, ),
         r'$\sigma=%.2f$' % (CPU_usage_std, )))
 
     prop = dict(boxstyle='square', facecolor='wheat', alpha=0.5)
-    plt.text(1, len(y) + 7, textstr, fontsize = 10, bbox=prop)
+    
+    # DATA VISUALIZATION
+    y = np.arange(len(a))
 
+    # CPU USAGE PLOT
+    plt.figure(3)
+    plt.plot(y, a)
+    plt.legend([textstr])
     plt.xlabel('Sample')
     plt.ylabel('CPU usage in %')
     plt.title('CPU usage')
-    plt.show()
-
-
-def plot_improvementDifferences():
-
-    #[nr of tasks, with changes, without changes, length difference]
-    content = readFile("benchmarking/benchmarks_startend_without_OS_changes.txt")
-    data = []
-    data.append(content.split(": ")[1])
-    data.append(content.split(": ")[2])
-    data.append(content.split(": ")[3])
-    data.append(content.split(": ")[4])
-
-    data[0] = data[0].split(" \r")[0]
-    data[1] = data[1].split(" \r")[0]
-    data[1] = int(data[1])
-    data[2] = data[2].split("\r")[0]
-    data[2] = int(data[2])
-    data[3] = data[3].split(" \r")[0]
-    data[3] = abs(int(data[3]))
-
-    title = "Improvement in lines of code for " + data[0] + " threads"
     
-    data = [data[1], data[2], data[3]]
-    bar_titles = ["with improvement", "without improvement", "difference"]
-    
-    
-    plt.bar(bar_titles, data)
-    plt.title(title)
+    # GENERAL CODE LENGTH FIGURE
+    plt.figure(2)
+    plt.plot(x, with_imp, label = "With improvements")
+    plt.plot(x, without_imp, label= "Without improvements")
+    plt.plot(x, diff, label= "Difference")
+
+    plt.title("Code lenght for general case")
+    plt.xlabel("Number of threads")
     plt.ylabel("Lines of code")
-    plt.xticks(["with improvement", "without improvement", "difference"])
+    plt.legend(["With improvement", "Without improvement", "Difference"])
+    
     plt.show()
+
 
 def plot_gantt():
     data = readFile('benchmarking/benchmarks_startend_cpu.txt')
@@ -114,7 +143,7 @@ def plot_gantt():
             i = data.find("calc=E:", i)
             end = int(data[i+7] + data[i+8])
             df_list.append(pd.DataFrame([dict(Task="Calculate Servo Position", Start=start, End=end)]))
-        elif i < 3500:
+        elif i < 3100:
             i = data.find("calc=S:", i)
             start = int(data[i+7] + data[i+8] + data[i+9])
             i = data.find("calc=E:", i)
@@ -138,13 +167,13 @@ def plot_gantt():
             i = data.find("set=E:", i)
             end = int(data[i+6])
             df_list.append(pd.DataFrame([dict(Task="Set Servo Position", Start=start, End=end)]))
-        elif i < 150:
+        elif i < 200:
             i = data.find("set=S:", i)
             start = int(data[i+6] + data[i+7])
             i = data.find("set=E:", i)
             end = int(data[i+6] + data[i+7])
             df_list.append(pd.DataFrame([dict(Task="Set Servo Position", Start=start, End=end)]))
-        elif i < 3500:
+        elif i < 3000:
             i = data.find("set=S:", i)
             start = int(data[i+6] + data[i+7] + data[i+8])
             i = data.find("set=E:", i)
@@ -174,7 +203,7 @@ def plot_gantt():
             i = data.find("cpu=E:", i)
             end = int(data[i+6] + data[i+7])
             df_list.append(pd.DataFrame([dict(Task="CPU thread", Start=start, End=end)]))
-        elif i < 3700:
+        elif i < 3200:
             i = data.find("cpu=S:", i)
             start = int(data[i+6] + data[i+7] + data[i+8])
             i = data.find("cpu=E:", i)
@@ -204,7 +233,7 @@ def plot_gantt():
             i = data.find("press=E:", i)
             end = int(data[i+8] + data[i+9])
             df_list.append(pd.DataFrame([dict(Task="Pressure thread", Start=start, End=end)]))
-        elif i < 3500:
+        elif i < 3200:
             i = data.find("press=S:", i)
             start = int(data[i+8] + data[i+9] + data[i+10])
             i = data.find("press=E:", i)
@@ -223,7 +252,7 @@ def plot_gantt():
     # TEMPERATURE THREAD  
     while i < len(data) and i != -1:
         
-        if i < 40: 
+        if i < 20: 
             i = data.find("temp=S:", i)           
             start = int(data[i+7])
             i = data.find("temp=E:", i)
@@ -235,7 +264,7 @@ def plot_gantt():
             i = data.find("temp=E:", i)
             end = int(data[i+7] + data[i+8])
             df_list.append(pd.DataFrame([dict(Task="Temperature thread", Start=start, End=end)]))
-        elif i < 3500:
+        elif i < 3000:
             i = data.find("temp=S:", i)
             start = int(data[i+7] + data[i+8] + data[i+9])
             i = data.find("temp=E:", i)
@@ -265,15 +294,11 @@ def plot_gantt():
 
 
 
-
 if __name__ == '__main__':
 
    # SCHEDULING PLOT
-   plot_gantt()
+   # plot_gantt()
    
    # IMPROVEMENT VISUALIZATION
-   # plot_improvementDifferences()
-
-   # CPU USAGE
-   plot_CPU_usage()
+   plot_charts()
 
