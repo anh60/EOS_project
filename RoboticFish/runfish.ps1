@@ -3,6 +3,8 @@ $qemupath = "C:/RT-ThreadStudio/repo/Extract/Debugger_Support_Packages/RealThrea
 Write-Output ""
 Write-Output "Run in terminal   [1]"
 Write-Output "Save to file      [2]"
+Write-Output "Plot benchmark    [3]"
+
 Write-Output "What to do?     "
 $q = Read-Host " "
 
@@ -70,7 +72,8 @@ if ($q -eq '1') {
         -M stm32f401-st-nucleo `
         -sd sd.bin `
         -serial stdio `
-        -monitor null -nographic `
+        -monitor null `
+        -nographic `
         -kernel Debug/rtthread.bin
 } 
 elseif ($q -eq '2') {
@@ -83,7 +86,7 @@ elseif ($q -eq '2') {
     $type = Read-Host " "
 
     if ($type -eq '4') {
-        Write-Output "  How many periodic tasks do you have?"
+        Write-Output "  How many periodic threads do you have?"
         $tasks = Read-Host " "
         Write-CodeDiff($tasks)
     }
