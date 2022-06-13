@@ -91,6 +91,10 @@ elseif ($q -eq '2') {
         Write-Log
     }
 }
+elseif ($q -eq '3') {
+    python ./benchmarking/data_representation.py
+
+}
 else {
     Write-Output "nope"
     Write-Output ""
