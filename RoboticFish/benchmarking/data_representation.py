@@ -374,5 +374,5 @@ if __name__ == '__main__':
    plot_gantt()
    
    # IMPROVEMENT VISUALIZATION
-   # plot_charts()
+   plot_charts()
 
