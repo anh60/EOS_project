@@ -1,8 +1,9 @@
 from cProfile import label
+from operator import index
 from unicodedata import name
 import numpy as np
 import matplotlib.pyplot as plt
-import plotly.express as px
+import plotly.figure_factory as ff
 import pandas as pd
 
 def readFile(filename):
@@ -127,169 +128,242 @@ def plot_gantt():
     data = readFile('benchmarking/benchmarks_startend_cpu.txt')
     df_list = []
     i = 0
+    j = 0
 
     # CALCULATION THREAD
     while i < len(data) and i != -1:
-        
-        if i < 40: 
-            i = data.find("calc=S:", i)           
+
+        i = data.find("calc=S:", i)
+        if i == -1: 
+            break
+        elif data[i+8] == ';':
             start = int(data[i+7])
-            i = data.find("calc=E:", i)
-            end = int(data[i+7])
-            df_list.append(pd.DataFrame([dict(Task="Calculate Servo Position", Start=start, End=end)]))
-        elif i < 150:
-            i = data.find("calc=S:", i)
+        elif data[i+9] == ';':
             start = int(data[i+7] + data[i+8])
-            i = data.find("calc=E:", i)
-            end = int(data[i+7] + data[i+8])
-            df_list.append(pd.DataFrame([dict(Task="Calculate Servo Position", Start=start, End=end)]))
-        elif i < 3100:
-            i = data.find("calc=S:", i)
-            start = int(data[i+7] + data[i+8] + data[i+9])
-            i = data.find("calc=E:", i)
-            end = int(data[i+7] + data[i+8] + data[i+9]) 
-            df_list.append(pd.DataFrame([dict(Task="Calculate Servo Position", Start=start, End=end)]))
-        else:
-            i = data.find("calc=S:", i)
-            if i == -1:
-                break
-            start = int(data[i+7] + data[i+8] + data[i+9] + data[i+10])
-            i = data.find("calc=E:", i)
-            end = int(data[i+7] + data[i+8] + data[i+9] + data[i+10])
-            df_list.append(pd.DataFrame([dict(Task="Calculate Servo Position", Start=start, End=end)]))
+        elif data[i+10] == ';':
+            start = int(data[i+7] + data[i+8]+ data[i+9])
+        elif data[i+11] == ';':
+            start = int(data[i+7] + data[i+8]+ data[i+9] + data[i+10])
+        
+        i = data.find("calc=E:", i)
+        if i == -1: 
+            break
+        elif data[i+8] == ';':
+            finish = int(data[i+7])
+            df1 = pd.DataFrame([dict(Task="Calculate Servo Position", Start=start, Finish=finish)] , columns=['Task', 'Start', 'Finish'])
+            df_list.append(df1)
+        elif data[i+9] == ';':
+            finish = int(data[i+7] + data[i+8])
+            df1 = pd.DataFrame([dict(Task="Calculate Servo Position", Start=start, Finish=finish)] , columns=['Task', 'Start', 'Finish'])
+            df_list.append(df1)
+        elif data[i+10] == ';':
+            finish = int(data[i+7] + data[i+8]+ data[i+9])
+            df1 = pd.DataFrame([dict(Task="Calculate Servo Position", Start=start, Finish=finish)] , columns=['Task', 'Start', 'Finish'])
+            df_list.append(df1)
+        elif data[i+11] == ';':
+            finish = int(data[i+7] + data[i+8]+ data[i+9] + data[i+10])
+            df1 = pd.DataFrame([dict(Task="Calculate Servo Position", Start=start, Finish=finish)] , columns=['Task', 'Start', 'Finish'])
+            df_list.append(df1)
+
+    
 
     i = 0
     # SET SERVO THREAD  
     while i < len(data) and i != -1:
-        if i < 40:
-            i = data.find("set=S:", i)
+        i = data.find("set=S:", i)
+        if i == -1: 
+            break
+        elif data[i+7] == ';':
             start = int(data[i+6])
-            i = data.find("set=E:", i)
-            end = int(data[i+6])
-            df_list.append(pd.DataFrame([dict(Task="Set Servo Position", Start=start, End=end)]))
-        elif i < 200:
-            i = data.find("set=S:", i)
+        elif data[i+8] == ';':
             start = int(data[i+6] + data[i+7])
-            i = data.find("set=E:", i)
-            end = int(data[i+6] + data[i+7])
-            df_list.append(pd.DataFrame([dict(Task="Set Servo Position", Start=start, End=end)]))
-        elif i < 3000:
-            i = data.find("set=S:", i)
-            start = int(data[i+6] + data[i+7] + data[i+8])
-            i = data.find("set=E:", i)
-            end = int(data[i+6] + data[i+7] + data[i+8]) 
-            df_list.append(pd.DataFrame([dict(Task="Set Servo Position", Start=start, End=end)]))
-        else:
-            i = data.find("set=S:", i)
-            if i == -1:
-                break
-            start = int(data[i+6] + data[i+7] + data[i+8] + data[i+9])
-            i = data.find("set=E:", i)
-            end = int(data[i+6] + data[i+7] + data[i+8] + data[i+9])
-            df_list.append(pd.DataFrame([dict(Task="Set Servo Position", Start=start, End=end)]))
+        elif data[i+9] == ';':
+            start = int(data[i+6] + data[i+7]+ data[i+8])
+        elif data[i+10] == ';':
+            start = int(data[i+6] + data[i+7]+ data[i+8] + data[i+9])
+        
+        i = data.find("set=E:", i)
+        if i == -1: 
+            break
+        elif data[i+7] == ';':
+            finish = int(data[i+6])
+            df1 = pd.DataFrame([dict(Task="Set Servo Position", Start=start, Finish=finish)] , columns=['Task', 'Start', 'Finish'])
+            df_list.append(df1)
+        elif data[i+8] == ';':
+            finish = int(data[i+6] + data[i+7])
+            df1 = pd.DataFrame([dict(Task="Set Servo Position", Start=start, Finish=finish)] , columns=['Task', 'Start', 'Finish'])
+            df_list.append(df1)
+        elif data[i+9] == ';':
+            finish = int(data[i+6] + data[i+7]+ data[i+8])
+            df1 = pd.DataFrame([dict(Task="Set Servo Position", Start=start, Finish=finish)] , columns=['Task', 'Start', 'Finish'])
+            df_list.append(df1)
+        elif data[i+10] == ';':
+            finish = int(data[i+6] + data[i+7]+ data[i+8] + data[i+9])
+            df1 = pd.DataFrame([dict(Task="Set Servo Position", Start=start, Finish=finish)] , columns=['Task', 'Start', 'Finish'])
+            df_list.append(df1)
+
 
     i = 0
     # CPU THREAD  
     while i < len(data) and i != -1:
-        if i < 40:
-            i = data.find("cpu=S:", i)
+
+        i = data.find("cpu=S:", i)
+        if i == -1: 
+            break
+        elif data[i+7] == ';':
             start = int(data[i+6])
-            i = data.find("cpu=E:", i)
-            end = int(data[i+6])
-            df_list.append(pd.DataFrame([dict(Task="CPU thread", Start=start, End=end)]))
-        elif i < 500:
-            i = data.find("cpu=S:", i)
+        elif data[i+8] == ';':
             start = int(data[i+6] + data[i+7])
-            i = data.find("cpu=E:", i)
-            end = int(data[i+6] + data[i+7])
-            df_list.append(pd.DataFrame([dict(Task="CPU thread", Start=start, End=end)]))
-        elif i < 3200:
-            i = data.find("cpu=S:", i)
-            start = int(data[i+6] + data[i+7] + data[i+8])
-            i = data.find("cpu=E:", i)
-            end = int(data[i+6] + data[i+7] + data[i+8]) 
-            df_list.append(pd.DataFrame([dict(Task="CPU thread", Start=start, End=end)]))
-        else:
-            i = data.find("cpu=S:", i)
-            if i == -1:
-                break
-            start = int(data[i+6] + data[i+7] + data[i+8] + data[i+9])
-            i = data.find("cpu=E:", i)
-            end = int(data[i+6] + data[i+7] + data[i+8] + data[i+9])
-            df_list.append(pd.DataFrame([dict(Task="CPU thread", Start=start, End=end)]))
+        elif data[i+9] == ';':
+            start = int(data[i+6] + data[i+7]+ data[i+8])
+        elif data[i+10] == ';':
+            start = int(data[i+6] + data[i+7]+ data[i+8] + data[i+9])
+        
+        i = data.find("cpu=E:", i)
+        if i == -1: 
+            break
+        elif data[i+7] == ';':
+            finish = int(data[i+6])
+            df1 = pd.DataFrame([dict(Task="CPU", Start=start, Finish=finish)] , columns=['Task', 'Start', 'Finish'])
+            df_list.append(df1)
+
+        elif data[i+8] == ';':
+            finish = int(data[i+6] + data[i+7])
+            df1 = pd.DataFrame([dict(Task="CPU", Start=start, Finish=finish)] , columns=['Task', 'Start', 'Finish'])
+            df_list.append(df1)
+            
+
+        elif data[i+9] == ';':
+            finish = int(data[i+6] + data[i+7]+ data[i+8])
+            df1 = pd.DataFrame([dict(Task="CPU", Start=start, Finish=finish)] , columns=['Task', 'Start', 'Finish'])
+            df_list.append(df1)
+
+        elif data[i+10] == ';':
+            finish = int(data[i+6] + data[i+7]+ data[i+8] + data[i+9])
+            df1 = pd.DataFrame([dict(Task="CPU", Start=start, Finish=finish)] , columns=['Task', 'Start', 'Finish'])
+            df_list.append(df1)
+
 
     i = 0
     # PRESSURE thread  
     while i < len(data) and i != -1:
-        if i < 40:
-            i = data.find("press=S:", i)
+        i = data.find("press=S:", i)
+        if i == -1: 
+            break
+        elif data[i+9] == ';':
             start = int(data[i+8])
-            i = data.find("press=E:", i)
-            end = int(data[i+8])
-            df_list.append(pd.DataFrame([dict(Task="Pressure thread", Start=start, End=end)]))
-        elif i < 1000:
-            i = data.find("press=S:", i)
+        elif data[i+10] == ';':
             start = int(data[i+8] + data[i+9])
-            i = data.find("press=E:", i)
-            end = int(data[i+8] + data[i+9])
-            df_list.append(pd.DataFrame([dict(Task="Pressure thread", Start=start, End=end)]))
-        elif i < 3200:
-            i = data.find("press=S:", i)
-            start = int(data[i+8] + data[i+9] + data[i+10])
-            i = data.find("press=E:", i)
-            end = int(data[i+8] + data[i+9] + data[i+10])
-            df_list.append(pd.DataFrame([dict(Task="Pressure thread", Start=start, End=end)]))
-        else:
-            i = data.find("press=S:", i)
-            if i == -1:
-                break
-            start = int(data[i+8] + data[i+9] + data[i+10] + data[i+11])
-            i = data.find("press=E:", i)
-            end = int(data[i+8] + data[i+9] + data[i+10] + data[i+11])
-            df_list.append(pd.DataFrame([dict(Task="Pressure thread", Start=start, End=end)]))
+        elif data[i+11] == ';':
+            start = int(data[i+8] + data[i+9]+ data[i+10])
+        elif data[i+12] == ';':
+            start = int(data[i+8] + data[i+9]+ data[i+10] + data[i+11])
+        
+        i = data.find("press=E:", i)
+        if i == -1: 
+            break
+        elif data[i+9] == ';':
+            finish = int(data[i+8])
+            df1 = pd.DataFrame([dict(Task="Calculate Servo Position", Start=start, Finish=finish)] , columns=['Task', 'Start', 'Finish'])
+            df_list.append(df1) 
+
+        elif data[i+10] == ';':
+            finish = int(data[i+8] + data[i+9])
+            df1 = pd.DataFrame([dict(Task="Calculate Servo Position", Start=start, Finish=finish)] , columns=['Task', 'Start', 'Finish'])
+            df_list.append(df1) 
+            
+        elif data[i+11] == ';':
+            finish = int(data[i+8] + data[i+9]+ data[i+10])
+            df1 = pd.DataFrame([dict(Task="Calculate Servo Position", Start=start, Finish=finish)] , columns=['Task', 'Start', 'Finish'])
+            df_list.append(df1)
+            
+        elif data[i+12] == ';':
+            finish = int(data[i+8] + data[i+9]+ data[i+10] + data[i+11])
+            df1 = pd.DataFrame([dict(Task="Calculate Servo Position", Start=start, Finish=finish)] , columns=['Task', 'Start', 'Finish'])
+            df_list.append(df1)
+            
 
     i = 0
     # TEMPERATURE THREAD  
     while i < len(data) and i != -1:
-        
-        if i < 20: 
-            i = data.find("temp=S:", i)           
+
+        i = data.find("temp=S:", i)
+        if i == -1: 
+            break
+        elif data[i+8] == ';':
             start = int(data[i+7])
-            i = data.find("temp=E:", i)
-            end = int(data[i+7])
-            df_list.append(pd.DataFrame([dict(Task="Temperature thread", Start=start, End=end)]))
-        elif i < 300:
-            i = data.find("temp=S:", i)
+        elif data[i+9] == ';':
             start = int(data[i+7] + data[i+8])
-            i = data.find("temp=E:", i)
-            end = int(data[i+7] + data[i+8])
-            df_list.append(pd.DataFrame([dict(Task="Temperature thread", Start=start, End=end)]))
-        elif i < 3000:
-            i = data.find("temp=S:", i)
-            start = int(data[i+7] + data[i+8] + data[i+9])
-            i = data.find("temp=E:", i)
-            end = int(data[i+7] + data[i+8] + data[i+9]) 
-            df_list.append(pd.DataFrame([dict(Task="Temperature thread", Start=start, End=end)]))
-        else:
-            i = data.find("temp=S:", i)
-            if i == -1:
+        elif data[i+10] == ';':
+            start = int(data[i+7] + data[i+8]+ data[i+9])
+        elif data[i+11] == ';':
+            start = int(data[i+7] + data[i+8]+ data[i+9] + data[i+10])
+        
+        i = data.find("temp=E:", i)
+        if i == -1: 
+            break
+        elif data[i+8] == ';':
+            finish = int(data[i+7])
+            df1 = pd.DataFrame([dict(Task="Temperature Thread", Start=start, Finish=finish)] , columns=['Task', 'Start', 'Finish'])
+            df_list.append(df1)
+        elif data[i+9] == ';':
+            finish = int(data[i+7] + data[i+8])
+            df1 = pd.DataFrame([dict(Task="Temperature Thread", Start=start, Finish=finish)] , columns=['Task', 'Start', 'Finish'])
+            df_list.append(df1)
+        elif data[i+10] == ';':
+            finish = int(data[i+7] + data[i+8]+ data[i+9])
+            df1 = pd.DataFrame([dict(Task="Temperature Thread", Start=start, Finish=finish)] , columns=['Task', 'Start', 'Finish'])
+            df_list.append(df1)
+        elif data[i+11] == ';':
+            finish = int(data[i+7] + data[i+8]+ data[i+9] + data[i+10])
+            df1 = pd.DataFrame([dict(Task="Temperature Thread", Start=start, Finish=finish)] , columns=['Task', 'Start', 'Finish'])
+            df_list.append(df1)
+
+    i = 0
+        # EXTREME TEMPERATURE THREAD  
+    while i < len(data) and i != -1:
+
+        i = data.find("extemp=S:", i)
+        if data[i+1] == "x":
+            if i == -1: 
                 break
-            start = int(data[i+7] + data[i+8] + data[i+9] + data[i+10])
-            i = data.find("temp=E:", i)
-            end = int(data[i+7] + data[i+8] + data[i+9] + data[i+10])
-            df_list.append(pd.DataFrame([dict(Task="Temperature thread", Start=start, End=end)]))
+            elif data[i+10] == ';':
+                start = int(data[i+9])
+            elif data[i+11] == ';':
+                start = int(data[i+9] + data[i+10])
+            elif data[i+12] == ';':
+                start = int(data[i+9] + data[i+10]+ data[i+11])
+            elif data[i+13] == ';':
+                start = int(data[i+9] + data[i+10]+ data[i+11] + data[i+12])
+        
+        i = data.find("extemp=E:", i)
+        if data[i+1] == "x":
+            if i == -1: 
+                break
+            elif data[i+10] == ';':
+                finish = int(data[i+9])
+            elif data[i+11] == ';':
+                finish = int(data[i+9] + data[i+10])
+                df1 = pd.DataFrame([dict(Task="Extreme Temperature Handling", Start=start, Finish=finish)] , columns=['Task', 'Start', 'Finish'])
+                df_list.append(df1)
+            elif data[i+12] == ';':
+                finish = int(data[i+9] + data[i+10]+ data[i+11])
+                df1 = pd.DataFrame([dict(Task="Extreme Temperature Handling", Start=start, Finish=finish)] , columns=['Task', 'Start', 'Finish'])
+                df_list.append(df1)
+            elif data[i+13] == ';':
+                finish = int(data[i+9] + data[i+10]+ data[i+11] + data[i+12])
+                df1 = pd.DataFrame([dict(Task="Extreme Temperature Handling", Start=start, Finish=finish)] , columns=['Task', 'Start', 'Finish'])
+                df_list.append(df1)
 
     # CONCATENATE DATA FRAMES
-    df = pd.concat(df_list)   
-    df['delta'] = df['End'] - df['Start']
+    df = pd.concat(df_list) 
 
     # CREATE GANTT PLOT
-    fig = px.timeline(df, x_start="Start", x_end="End", y="Task", color="Task")
-    fig.update_yaxes(autorange="reversed")
+    
+    fig = ff.create_gantt(df, index_col='Task', show_colorbar=True,
+                      group_tasks=True)
+    fig.update_layout(xaxis_type='linear')
 
-    fig.layout.xaxis.type = 'linear'
-    fig.data[0].x = df.delta.tolist()
-    f = fig.full_figure_for_development(warn=False)
     fig.show()
 
 
@@ -297,8 +371,8 @@ def plot_gantt():
 if __name__ == '__main__':
 
    # SCHEDULING PLOT
-   # plot_gantt()
+   plot_gantt()
    
    # IMPROVEMENT VISUALIZATION
-   plot_charts()
+   # plot_charts()
 
