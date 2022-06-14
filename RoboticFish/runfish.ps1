@@ -35,7 +35,7 @@ function Write-Log() {
         
     }
     finally {
-        notepad $logfile
+        python ./benchmarking/data_representation.py
         exit
     }
 

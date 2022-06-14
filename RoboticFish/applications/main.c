@@ -115,8 +115,8 @@ int main(void)
     {
         current_time = rt_tick_get();
         //main_normal();
-        //main_cpu();
-        main_demo(current_time);
+        main_cpu();
+        //main_demo(current_time);
     }
     close_threads();
 
